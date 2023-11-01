@@ -19,6 +19,7 @@ const router = new VueRouter({
     {
       path: "/detail/:id?",
       name: "detail",
+      props() {}
       props(route) {
         return {
           id: route.query.id,

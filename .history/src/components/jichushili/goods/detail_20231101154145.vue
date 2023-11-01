@@ -11,7 +11,7 @@
 </template>
 <script>
 export default {
-  props: ['id', 'title', 'price'],
+  props: ['id', 'title'],
   data() {
     return {
       goodsInfo: {},
@@ -49,7 +49,6 @@ export default {
     }
   },
   created() {
-    console.log(this.id, this.title, this.price)
     // this.goodsInfo = this.proList.filter(item => item.id === Number(this.id))[0]
   }
 }

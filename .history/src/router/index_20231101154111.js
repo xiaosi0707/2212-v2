@@ -19,12 +19,9 @@ const router = new VueRouter({
     {
       path: "/detail/:id?",
       name: "detail",
-      props(route) {
-        return {
-          id: route.query.id,
-          title: route.query.title,
-          price: route.query.price,
-        };
+      props: {
+        id: 1,
+        title: "最编程",
       },
       component: Detail,
     },

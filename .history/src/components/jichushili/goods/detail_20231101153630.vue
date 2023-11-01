@@ -1,17 +1,17 @@
 <template>
   <div>
     <h2>详情页</h2>
-    <!-- <p>{{ goodsInfo.id }}</p>
+    <p>{{ goodsInfo.id }}</p>
     <p>{{ goodsInfo.title }}</p>
     <p>{{ goodsInfo.price }}</p>
     <p>
       <img :src="goodsInfo.img" alt="">
-    </p> -->
+    </p>
   </div>
 </template>
 <script>
 export default {
-  props: ['id', 'title', 'price'],
+  props: ['id'],
   data() {
     return {
       goodsInfo: {},
@@ -49,8 +49,8 @@ export default {
     }
   },
   created() {
-    console.log(this.id, this.title, this.price)
-    // this.goodsInfo = this.proList.filter(item => item.id === Number(this.id))[0]
+    this.goodsInfo = this.proList.filter(item => item.id === Number(id))[0]
+
   }
 }
 

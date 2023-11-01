@@ -1,17 +1,22 @@
 <template>
   <div>
     <h2>详情页</h2>
-    <!-- <p>{{ goodsInfo.id }}</p>
+    <p>{{ goodsInfo.id }}</p>
     <p>{{ goodsInfo.title }}</p>
     <p>{{ goodsInfo.price }}</p>
     <p>
       <img :src="goodsInfo.img" alt="">
-    </p> -->
+    </p>
   </div>
 </template>
 <script>
 export default {
-  props: ['id', 'title', 'price'],
+  mounted() {
+    console.log('detail组件挂载完毕')
+  },
+  beforeDestroy() {
+    console.log('detail组件被销毁了')
+  },
   data() {
     return {
       goodsInfo: {},
@@ -49,8 +54,15 @@ export default {
     }
   },
   created() {
-    console.log(this.id, this.title, this.price)
-    // this.goodsInfo = this.proList.filter(item => item.id === Number(this.id))[0]
+    console.log(this.$route.params)
+    拿到了list组件传递过来的商品id
+    if (this.$route.query.id) {
+      const goodsId = this.$route.query.id
+      // 根据拿到的商品id从整个商品数据中遍历找到和拿到的id对应的商品数据
+      this.goodsInfo = this.proList.filter(item => item.id === Number(goodsId))[0]
+    }
+
+
   }
 }
 

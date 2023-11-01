@@ -49,7 +49,7 @@ export default {
     }
   },
   created() {
-    console.log(this.id, this.title, this.price)
+    console.log(this.id, this.title)
     // this.goodsInfo = this.proList.filter(item => item.id === Number(this.id))[0]
   }
 }

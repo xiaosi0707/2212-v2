@@ -21,11 +21,11 @@ const router = new VueRouter({
       name: "detail",
       props(route) {
         return {
-          id: route.query.id,
-          title: route.query.title,
-          price: route.query.price,
-        };
-      },
+            id: route.query.id,
+            title: route.query.title,
+            price: route.query.price
+        }
+    },
       component: Detail,
     },
   ],

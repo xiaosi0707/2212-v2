@@ -1,20 +1,25 @@
 <template>
-  <div>
-    <h2>详情页</h2>
-    <!-- <p>{{ goodsInfo.id }}</p>
-    <p>{{ goodsInfo.title }}</p>
-    <p>{{ goodsInfo.price }}</p>
-    <p>
-      <img :src="goodsInfo.img" alt="">
-    </p> -->
+  <div class="list">
+    <router-link :to= tag="dl" v-for="item in proList">
+      <dt>
+        <img :src="item.img" />
+      </dt>
+      <dd>
+        <p>{{ item.id }} - {{ item.title }} - {{ item.price }}</p>
+      </dd>
+    </router-link>
   </div>
 </template>
 <script>
 export default {
-  props: ['id', 'title', 'price'],
+  mounted() {
+    console.log('list组件挂载完毕')
+  },
+  beforeDestroy() {
+    console.log('list组件被销毁了')
+  },
   data() {
     return {
-      goodsInfo: {},
       proList: [{
           id: 1,
           title: '连衣裙',
@@ -47,11 +52,20 @@ export default {
         }
       ]
     }
-  },
-  created() {
-    console.log(this.id, this.title, this.price)
-    // this.goodsInfo = this.proList.filter(item => item.id === Number(this.id))[0]
   }
 }
 
 </script>
+<style>
+.list dl {
+  width: 200px;
+
+  overflow: hidden;
+  border: 1px gray soild;
+  float: left;
+
+  text-align: center;
+  margin-right: 12px;
+}
+
+</style>
