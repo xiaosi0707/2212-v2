@@ -1,9 +1,11 @@
 import Vue from 'vue' // 导入vue.js相当于
 import App from './App.vue' // 导入App.vue组件
+import ElementUI from 'element-ui';
+import 'element-ui/lib/theme-chalk/index.css';
 // import Parent from './components/parent.vue'
 // 导入路由对象
-import router from './router/index.js'
-
+import router from './router/index-nav.js'
+Vue.use(ElementUI)
 // 关闭开发环境的提示
 Vue.config.productionTip = false
 // Vue实例

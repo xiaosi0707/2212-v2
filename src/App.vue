@@ -1,14 +1,6 @@
 <template>
   <div id="app">
-
+    <!-- 一级路由 -->
     <router-view />
-
   </div>
 </template>
-
-<style>
-.router-link-exact-active {
-   color:red
-
-}
-</style>

@@ -1,30 +1,18 @@
 <template>
   <div class="list">
-    <router-link
-      :to="{
-        name: 'detail',
-        query: { id: item.id, title: item.title, price: item.price },
-      }"
-      tag="dl"
-      v-for="item in proList"
-    >
+    <router-link :to="{ name: 'detail', params: { id: item.id } }" v-for="item in proList">
       <dt>
-        <img :src="item.img" />
+        <img src="https://img12.360buyimg.com/n7/jfs/t1/98826/5/34282/70832/6538dcf1Fac4dc1aa/e8c242cd9ddbd6c8.jpg"/>
       </dt>
       <dd>
-        <p>{{ item.id }} - {{ item.title }} - {{ item.price }}</p>
+        <p>1 - 199 - {{ item.title }}</p>
       </dd>
     </router-link>
+
   </div>
 </template>
 <script>
 export default {
-  mounted() {
-    console.log("list组件挂载完毕");
-  },
-  beforeDestroy() {
-    console.log("list组件被销毁了");
-  },
   data() {
     return {
       proList: [
