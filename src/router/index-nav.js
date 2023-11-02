@@ -10,17 +10,22 @@ const router = new VueRouter({
     {
       path: "/",
       component: Login,
+      meta: {
+        title: '登陆'
+      }
     },
     {
       path: '/main',
-      component: Main
+      component: Main,
+      meta: {
+        title: '欢迎进入后台管理系统主页'
+      }
     }
   ],
 });
 // 路由前置守卫
 router.beforeEach((to, from ,next) => {
-  console.log('to:', to)
-  console.log('from:', from)
+  console.log('beforeEach')
   if(to.path === '/main') {
     // 你想进入后台管理系统那么我就得检查你有没有权限（在线状态就有权限反之没有权限）
     const token = localStorage.getItem('token')
@@ -35,6 +40,18 @@ router.beforeEach((to, from ,next) => {
     // 放行
     next()
   }
-
+})
+router.beforeResolve((to, from, next) => {
+  console.log('beforeResolve')
+  next()
+})
+// 路由后置守卫
+router.afterEach((to, from) => {
+  console.log(to, from)
+  if (to.path === '/') {
+    document.title = to.meta.title
+  } else if (to.path === '/main') {
+    document.title = to.meta.title
+  }
 })
 export default router;
