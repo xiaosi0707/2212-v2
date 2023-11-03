@@ -14,6 +14,7 @@
 </template>
 
 <script>
+import Axios from 'axios'
 export default {
   data() {
     return {
@@ -25,25 +26,46 @@ export default {
   },
   methods: {
     /*
-    * 登陆：
-    *   1. 如何拿到用户输入的用户名？
+    * 登陆业务需求：
+    * 1. 获取用户输入的用户名和密码
+    * 2. 点击“登陆”按钮发送http请求，然后把用户名和密码通过接口传送给给后端
+    * 3. 后端拿到前端传递过来的用户名和密码到数据库中校验
+    * 4. 校验是否有该用户名的存在，如果存在那么继续校验密码是否正确
+    * 5. 后端校验完毕给前端返回校验后的结果
+    * 登陆功能实现：
+    * 1. 我们需要先给登陆按钮添加点击事件并且绑定回调函数
+    * 2. 点击登录按钮发送http请求把用户名和密码发送给服务端
+    * 3. 根据服务端响应的数据然后做相应的处理
+    * 4. 成功的处理
+    *     4.1 给予成功提示
+    *     4.2 把token存在本地存储中
+    *     4.3 跳转到后台管理系统的主页
+    * 5. 错误的处理
+    *     5.1 给予错误的提示
+    *     5.2 清空token
+    *     5.3 留在登录页
     *
     * */
     login() {
-      // 用户名和密码正确就登录成功
-      if(this.form.username === 'admin' && this.form.password === '123456') {
-        // 把获取到的token值存到本地存储
-        localStorage.setItem('token', '23h5j23jhj25hj25hj32h5j3h5h23j5h3h5j3j5hj3')
-        // 登陆成功的提示
-        this.$message.success('登陆成功')
-        // 跳转到后台管理系统的主页
-        this.$router.push('/main')
-      } else {
-        // 清空本地存储的数据
-        localStorage.removeItem('token')
-        // 给予错误的提示
-        this.$message.error('用户名或密码错误')
-      }
+      Axios.post('http://shiyansong.cn:8888/api/private/v1/login',  {
+        username: this.form.username,
+        password: this.form.password
+      }).then(res => {
+        console.log('后端响应给前端的数据：', res)
+        // 状态码===200就是成功了
+        if (res.data.meta.status === 200) {
+          this.$message.success(res.data.meta.msg)
+          // 把token存储在本地存储中
+          localStorage.setItem('token', res.data.data.token)
+          // 跳转到后台管理系统的主页
+          this.$router.push('/main')
+        } else {
+          // 错误的提示
+          this.$message.error(res.data.meta.msg)
+          // 清空token
+          localStorage.removeItem('token')
+        }
+      })
     }
   }
 }
