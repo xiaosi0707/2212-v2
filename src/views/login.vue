@@ -1,3 +1,4 @@
+
 <template>
   <el-form ref="form" label-width="80px">
     <el-form-item label="用户名">
@@ -11,6 +12,7 @@
     </el-form-item>
   </el-form>
 </template>
+
 <script>
 export default {
   data() {
