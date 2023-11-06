@@ -107,7 +107,7 @@ export default {
       usersData: [],
       /* 添加用户模态框 */
       // 添加用户模态框显示还是隐藏
-      dialogFormVisible: true,
+      dialogFormVisible: false,
       // label的宽度 - 添加用户
       formLabelWidth: '100px',
       // 收集用户输入的数据（数据的数量大于一条就用对象或数组）
@@ -121,29 +121,53 @@ export default {
     }
   },
   created() {
-    // 请求用户列表的接口
-    Axios.get('http://shiyansong.cn:8888/api/private/v1/users', {
-      params: {
-        query: '',
-        pagenum: 1,
-        pagesize: 10
-      },
-      // 配置请求头，携带token给服务端，让偶服务端认识我给我要的数据
-      headers: {
-        'Authorization': localStorage.getItem('token')
-      }
-    },).then(res => {
-      console.log(res)
-      let { users } = res.data.data
-      this.usersData = users
-    })
+  this.getUserData()
   },
   methods: {
+    // 请求用户列表
+    getUserData() {
+      // 请求用户列表的接口
+      Axios.get('http://shiyansong.cn:8888/api/private/v1/users', {
+        params: {
+          query: '',
+          pagenum: 1,
+          pagesize: 20
+        },
+        // 配置请求头，携带token给服务端，让偶服务端认识我给我要的数据
+        headers: {
+          'Authorization': localStorage.getItem('token')
+        }
+      },).then(res => {
+        console.log(res)
+        let { users } = res.data.data
+        this.usersData = users
+      })
+    },
     // 添加用户
     add() {
       // 关闭添加用户的模态框
       this.dialogFormVisible = false
-      console.log('市级道德用户的数据：', this.addUserForm)
+      // 发送添加用户的http请求
+      Axios.post(`http://shiyansong.cn:8888/api/private/v1/users`,
+        this.addUserForm,
+        {
+          headers: {
+            'Authorization': localStorage.getItem('token')
+          }
+        }).then(res => {
+        console.log('添加用户返回的数据：', res)
+        // 成功的判断
+        if (res.data.meta.status === 201) {
+          this.$message.success(res.data.meta.msg)
+          // 显示最新的添加的数据
+          this.getUserData()
+          return
+        }
+        // 错误的处理
+        this.$message.error(res.data.meta.msg)
+        // 再次调用请求用户列表的接口
+
+      })
     }
   }
 }
