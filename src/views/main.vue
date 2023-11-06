@@ -21,7 +21,7 @@
                   <i class="el-icon-search"></i>
                 </template>
               </el-input>
-               <el-button type="primary">添加用户</el-button>
+               <el-button type="primary" @click="dialogFormVisible = true">添加用户</el-button>
             </span>
           </div>
           <div  class="text item">
@@ -73,7 +73,31 @@
         <!-- 表格 -->
       </el-main>
     </el-container>
+    <!-- 添加用户的模态框 -->
+    <el-dialog title="添加用户" :visible.sync="dialogFormVisible">
+      <el-form >
+        <el-form-item label="用户名" :label-width="formLabelWidth">
+          <el-input v-model="addUserForm.username" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" :label-width="formLabelWidth">
+          <el-input v-model="addUserForm.password"  autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" :label-width="formLabelWidth">
+          <el-input v-model="addUserForm.email"  autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="手机" :label-width="formLabelWidth">
+          <el-input v-model="addUserForm.mobile"  autocomplete="off"></el-input>
+        </el-form-item>
+
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="add">确 定</el-button>
+      </div>
+    </el-dialog>
+    <!-- 添加用户的模态框 -->
   </el-container>
+
 </template>
 <script>
 import Axios from 'axios'
@@ -81,23 +105,19 @@ export default {
   data() {
     return {
       usersData: [],
-      tableData: [{
-        date: '2016-05-02',
-        name: '王小虎',
-        address: '市普陀区金沙江路 1518 弄'
-      }, {
-        date: '2016-05-04',
-        name: '王小虎',
-        address: '市普陀区金沙江路 1517 弄'
-      }, {
-        date: '2016-05-01',
-        name: '王小虎',
-        address: '市普陀区金沙江路 1519 弄'
-      }, {
-        date: '2016-05-03',
-        name: '王小虎',
-        address: '市普陀区金沙江路 1516 弄'
-      }]
+      /* 添加用户模态框 */
+      // 添加用户模态框显示还是隐藏
+      dialogFormVisible: true,
+      // label的宽度 - 添加用户
+      formLabelWidth: '100px',
+      // 收集用户输入的数据（数据的数量大于一条就用对象或数组）
+      addUserForm: {
+        username: '',
+        password: '',
+        email: '',
+        mobile: ''
+      }
+      /* 添加用户模态框 */
     }
   },
   created() {
@@ -117,6 +137,14 @@ export default {
       let { users } = res.data.data
       this.usersData = users
     })
+  },
+  methods: {
+    // 添加用户
+    add() {
+      // 关闭添加用户的模态框
+      this.dialogFormVisible = false
+      console.log('市级道德用户的数据：', this.addUserForm)
+    }
   }
 }
 </script>
