@@ -43,7 +43,7 @@
               </el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="scope">
-                  <el-button type="primary" icon="el-icon-edit" size="mini" @click="editOpen(scope.row.id)"></el-button>
+                  <el-button type="primary" icon="el-icon-edit" size="mini" @click="editOpen(scope.row)"></el-button>
                   <el-button type="danger" icon="el-icon-delete" size="mini" @click="del(scope.row.id)"></el-button>
                   <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
                 </template>
@@ -80,7 +80,7 @@
     <el-dialog title="编辑用户" :visible.sync="editDialogFormVisible">
       <el-form>
         <el-form-item label="用户名" :label-width="formLabelWidth">
-          <el-input disabled autocomplete="off"></el-input>
+          <el-input disabled v-model="editUserForm.username" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="邮箱" :label-width="formLabelWidth">
           <el-input v-model="editUserForm.email" autocomplete="off"></el-input>
@@ -103,10 +103,7 @@ export default {
   data() {
     return {
       // 收集编辑用户邮箱和手机号码
-      editUserForm: {
-        email: '',
-        mobile: ''
-      },
+      editUserForm: {},
       // 当前被编辑的用户id
       editingUserId: '',
       // 编辑用户模态框的显示或隐藏
@@ -138,13 +135,16 @@ export default {
   },
   methods: {
     // 编辑用户 - 打开模态框
-    editOpen(userId) {
-      // 把当前编辑的用户的id赋值给editingUserId
-      this.editingUserId = userId
+    editOpen(user) {
+      console.log('当前用户的信息：', user)
+      // 把当前编辑的用户的对象赋值给editUserForm
+      this.editUserForm = user
       // 打开编辑用户的模态框
       this.editDialogFormVisible = true
+      // 用户数据的回填
+      
     },
-    // 编辑用户
+    // 编辑用户 - 信息提交
     edit() {
       
       // 请求编辑用户的接口
@@ -153,13 +153,25 @@ export default {
         @params email 邮箱
         @params mobile 手机号
        */
-      Axios.put(`http://shiyansong.cn:8888/api/private/v1/users/${this.editingUserId}`,
+      Axios.put(`http://shiyansong.cn:8888/api/private/v1/users/${this.editUserForm.id}`,
         this.editUserForm, {
           headers: {
             'Authorization': localStorage.getItem('token')
           }
         }).then( res => {
           console.log(res)
+          // 关闭模态框
+          this.editDialogFormVisible = false
+          // 编辑成功
+          if (res.data.meta.status === 200) {
+            // statement
+            this.$message.success(res.data.meta.msg)
+            // 再次调用用户列表的方法
+            this.getUserData()
+          } else {
+            this.$message.error(res.data.meta.msg)
+          }
+          // 编辑失败
         })
     },
     // 搜索用户
