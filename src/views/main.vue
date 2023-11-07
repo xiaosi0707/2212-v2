@@ -11,63 +11,41 @@
           <el-breadcrumb-item>用户列表</el-breadcrumb-item>
         </el-breadcrumb>
         <!-- 面包屑 -->
-
         <!-- 表格 -->
         <el-card class="box-card">
           <div slot="header" class="clearfix">
             <span>
-              <el-input placeholder="请输入内容" v-model="usersParams.query"  style="width: 32%; margin-right: 10px;">
+              <el-input placeholder="请输入内容" v-model="usersParams.query" style="width: 32%; margin-right: 10px;">
                 <template slot="append">
                   <i class="el-icon-search" @click="search"></i>
                 </template>
               </el-input>
-               <el-button type="primary" @click="dialogFormVisible = true">添加用户</el-button>
+              <el-button type="primary" @click="dialogFormVisible = true">添加用户</el-button>
             </span>
           </div>
-          <div  class="text item">
-            <el-table
-              :data="usersData"
-              border
-              style="width: 100%">
-              <el-table-column
-                type="index"
-                label="id"
-                width="50">
+          <div class="text item">
+            <el-table :data="usersData" border style="width: 100%">
+              <el-table-column type="index" label="id" width="50">
               </el-table-column>
-              <el-table-column
-                prop="username"
-                label="姓名"
-                width="180">
+              <el-table-column prop="username" label="姓名" width="180">
               </el-table-column>
-              <el-table-column
-                prop="email"
-                label="邮箱">
+              <el-table-column prop="email" label="邮箱">
               </el-table-column>
-              <el-table-column
-                prop="mobile"
-                label="电话">
+              <el-table-column prop="mobile" label="电话">
               </el-table-column>
-              <el-table-column
-                prop="role_name"
-                label="角色">
+              <el-table-column prop="role_name" label="角色">
               </el-table-column>
-              <el-table-column
-                prop="mg_state"
-                label="状态">
+              <el-table-column prop="mg_state" label="状态">
                 <template slot-scope="scope">
-                  <el-switch
-                    v-model="scope.row.mg_state"
-                  >
+                  <el-switch v-model="scope.row.mg_state">
                   </el-switch>
                 </template>
               </el-table-column>
-              <el-table-column
-                label="操作">
+              <el-table-column label="操作">
                 <template slot-scope="scope">
-                <el-button type="primary" icon="el-icon-edit" size="mini"></el-button>
-
-                <el-button type="danger" icon="el-icon-delete" size="mini" @click="del(scope.row.id)"></el-button>
-                <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
+                  <el-button type="primary" icon="el-icon-edit" size="mini" @click="editOpen(scope.row.id)"></el-button>
+                  <el-button type="danger" icon="el-icon-delete" size="mini" @click="del(scope.row.id)"></el-button>
+                  <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -78,20 +56,19 @@
     </el-container>
     <!-- 添加用户的模态框 -->
     <el-dialog title="添加用户" :visible.sync="dialogFormVisible">
-      <el-form >
+      <el-form>
         <el-form-item label="用户名" :label-width="formLabelWidth">
           <el-input v-model="addUserForm.username" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="密码" :label-width="formLabelWidth">
-          <el-input v-model="addUserForm.password"  autocomplete="off"></el-input>
+          <el-input v-model="addUserForm.password" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="邮箱" :label-width="formLabelWidth">
-          <el-input v-model="addUserForm.email"  autocomplete="off"></el-input>
+          <el-input v-model="addUserForm.email" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="手机" :label-width="formLabelWidth">
-          <el-input v-model="addUserForm.mobile"  autocomplete="off"></el-input>
+          <el-input v-model="addUserForm.mobile" autocomplete="off"></el-input>
         </el-form-item>
-
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -99,15 +76,41 @@
       </div>
     </el-dialog>
     <!-- 添加用户的模态框 -->
+    <!-- 编辑用户的模态框 -->
+    <el-dialog title="编辑用户" :visible.sync="editDialogFormVisible">
+      <el-form>
+        <el-form-item label="用户名" :label-width="formLabelWidth">
+          <el-input disabled autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" :label-width="formLabelWidth">
+          <el-input v-model="editUserForm.email" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="手机" :label-width="formLabelWidth">
+          <el-input v-model="editUserForm.mobile" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="editDialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="edit">确 定</el-button>
+      </div>
+    </el-dialog>
+    <!-- 编辑用户的模态框 -->
   </el-container>
-
 </template>
 <script>
 import Axios from 'axios'
 export default {
   data() {
     return {
-
+      // 收集编辑用户邮箱和手机号码
+      editUserForm: {
+        email: '',
+        mobile: ''
+      },
+      // 当前被编辑的用户id
+      editingUserId: '',
+      // 编辑用户模态框的显示或隐藏
+      editDialogFormVisible: false,
       usersData: [],
       /* 添加用户模态框 */
       // 添加用户模态框显示还是隐藏
@@ -131,9 +134,34 @@ export default {
     }
   },
   created() {
-  this.getUserData()
+    this.getUserData()
   },
   methods: {
+    // 编辑用户 - 打开模态框
+    editOpen(userId) {
+      // 把当前编辑的用户的id赋值给editingUserId
+      this.editingUserId = userId
+      // 打开编辑用户的模态框
+      this.editDialogFormVisible = true
+    },
+    // 编辑用户
+    edit() {
+      
+      // 请求编辑用户的接口
+      /*
+        @params id 请求路径中的参数path表示
+        @params email 邮箱
+        @params mobile 手机号
+       */
+      Axios.put(`http://shiyansong.cn:8888/api/private/v1/users/${this.editingUserId}`,
+        this.editUserForm, {
+          headers: {
+            'Authorization': localStorage.getItem('token')
+          }
+        }).then( res => {
+          console.log(res)
+        })
+    },
     // 搜索用户
     search() {
       Axios.get('http://shiyansong.cn:8888/api/private/v1/users', {
@@ -157,7 +185,7 @@ export default {
         headers: {
           'Authorization': localStorage.getItem('token')
         }
-      },).then(res => {
+      }, ).then(res => {
         console.log(res)
         let { users } = res.data.data
         this.usersData = users
@@ -169,8 +197,7 @@ export default {
       this.dialogFormVisible = false
       // 发送添加用户的http请求
       Axios.post(`http://shiyansong.cn:8888/api/private/v1/users`,
-        this.addUserForm,
-        {
+        this.addUserForm, {
           headers: {
             'Authorization': localStorage.getItem('token')
           }
@@ -197,13 +224,13 @@ export default {
         type: 'warning'
       }).then(() => {
         /*
-      * @params id（你要删除的谁）？
-      * */
-        Axios.delete(`http://shiyansong.cn:8888/api/private/v1/users/${userId}`,  {
+         * @params id（你要删除的谁）？
+         * */
+        Axios.delete(`http://shiyansong.cn:8888/api/private/v1/users/${userId}`, {
           headers: {
             'Authorization': localStorage.getItem('token')
-          }}
-        ).then(res => {
+          }
+        }).then(res => {
           // 删除成功
           if (res.data.meta.status === 200) {
             this.$message({
@@ -232,9 +259,11 @@ export default {
     }
   }
 }
+
 </script>
 <style>
-.el-header, .el-footer {
+.el-header,
+.el-footer {
   background-color: #B3C0D1;
   color: #333;
   text-align: center;
@@ -253,7 +282,7 @@ export default {
   color: #333;
 }
 
-body > .el-container {
+body>.el-container {
   margin-bottom: 40px;
 }
 
@@ -289,4 +318,5 @@ body > .el-container {
   width: 100%;
   margin-top: 24px;
 }
+
 </style>
