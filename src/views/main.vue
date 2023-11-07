@@ -16,9 +16,9 @@
         <el-card class="box-card">
           <div slot="header" class="clearfix">
             <span>
-              <el-input placeholder="请输入内容"  style="width: 32%; margin-right: 10px;">
+              <el-input placeholder="请输入内容" v-model="usersParams.query"  style="width: 32%; margin-right: 10px;">
                 <template slot="append">
-                  <i class="el-icon-search"></i>
+                  <i class="el-icon-search" @click="search"></i>
                 </template>
               </el-input>
                <el-button type="primary" @click="dialogFormVisible = true">添加用户</el-button>
@@ -107,6 +107,7 @@ import Axios from 'axios'
 export default {
   data() {
     return {
+
       usersData: [],
       /* 添加用户模态框 */
       // 添加用户模态框显示还是隐藏
@@ -119,23 +120,39 @@ export default {
         password: '',
         email: '',
         mobile: ''
-      }
+      },
       /* 添加用户模态框 */
+      // 请求用户列表的参数
+      usersParams: {
+        query: '',
+        pagenum: 1,
+        pagesize: 20
+      }
     }
   },
   created() {
   this.getUserData()
   },
   methods: {
+    // 搜索用户
+    search() {
+      Axios.get('http://shiyansong.cn:8888/api/private/v1/users', {
+        params: this.usersParams,
+        // 配置请求头，携带token给服务端，让偶服务端认识我给我要的数据
+        headers: {
+          'Authorization': localStorage.getItem('token')
+        }
+      }).then(res => {
+        console.log('搜索结果：', res)
+        let { users } = res.data.data
+        this.usersData = users
+      })
+    },
     // 请求用户列表
     getUserData() {
       // 请求用户列表的接口
       Axios.get('http://shiyansong.cn:8888/api/private/v1/users', {
-        params: {
-          query: '',
-          pagenum: 1,
-          pagesize: 20
-        },
+        params: this.usersParams,
         // 配置请求头，携带token给服务端，让偶服务端认识我给我要的数据
         headers: {
           'Authorization': localStorage.getItem('token')
