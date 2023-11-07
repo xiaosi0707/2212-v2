@@ -63,9 +63,12 @@
               </el-table-column>
               <el-table-column
                 label="操作">
+                <template slot-scope="scope">
                 <el-button type="primary" icon="el-icon-edit" size="mini"></el-button>
-                <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
+
+                <el-button type="danger" icon="el-icon-delete" size="mini" @click="del(scope.row.id)"></el-button>
                 <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
+                </template>
               </el-table-column>
             </el-table>
           </div>
@@ -168,6 +171,47 @@ export default {
         // 再次调用请求用户列表的接口
 
       })
+    },
+    // 删除用户
+    del(userId) {
+      this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        /*
+      * @params id（你要删除的谁）？
+      * */
+        Axios.delete(`http://shiyansong.cn:8888/api/private/v1/users/${userId}`,  {
+          headers: {
+            'Authorization': localStorage.getItem('token')
+          }}
+        ).then(res => {
+          // 删除成功
+          if (res.data.meta.status === 200) {
+            this.$message({
+              type: 'success',
+              message: res.data.meta.msg
+            });
+            // 再次调用用户列表的接口（刷新数据）
+            this.getUserData()
+          } else {
+            // 删除失败
+            this.$message({
+              type: 'error',
+              message: res.data.meta.msg
+            });
+          }
+        })
+
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
+      console.log(userId)
+
     }
   }
 }
