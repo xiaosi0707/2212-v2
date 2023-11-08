@@ -8,9 +8,9 @@
           <!-- el-menu最大的导航组件 -->
           <el-menu unique-opened router default-active="2" class="el-menu-vertical-demo" background-color="#545c64" text-color="#fff" active-text-color="#ffd04b">
             <!-- el-submenu 一级导航 -->
-            <el-submenu :index="menu.id + ''" v-for="menu in menusList">
+            <el-submenu :index="menu.id + ''" v-for="menu, index in menusList">
               <template slot="title">
-                <i class="el-icon-location"></i>
+                <i :class="iconsList[index]"></i>
                 <span>{{ menu.authName }}</span>
               </template>
               <!-- el-menu-item就是二级导航 -->
@@ -35,7 +35,9 @@ export default {
   data() {
     return {
       // 左侧菜单数据
-      menusList: []
+      menusList: [],
+      // 菜单的icon
+      iconsList: ['el-icon-user-solid', 'el-icon-s-tools', 'el-icon-s-goods', 'el-icon-money', 'el-icon-data-line']
     }
   },
   created() {
