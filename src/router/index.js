@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 Vue.use(VueRouter);
 import Login from '../views/login.vue'
 import Main from '../views/main.vue'
+import Users from '../views/users.vue'
 
 //3．创建路由的实例对象
 const router = new VueRouter({
@@ -14,6 +15,12 @@ const router = new VueRouter({
     {
       path: '/main',
       component: Main,
+      children: [
+        {
+          path: '/users',
+          component: Users
+        }
+      ]
     }
   ],
 });

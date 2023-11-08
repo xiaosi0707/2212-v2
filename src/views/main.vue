@@ -2,8 +2,28 @@
   <el-container>
     <el-header>Header</el-header>
     <el-container>
-      <el-aside width="200px">Aside</el-aside>
+      <el-aside width="200px">
+        <el-col :span="24">
+          <!-- 左侧菜单布局 - start -->
+
+          <!-- el-menu最大的导航组件 -->
+          <el-menu unique-opened router default-active="2" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose"
+            background-color="#545c64" text-color="#fff" active-text-color="#ffd04b">
+            <!-- el-submenu 一级导航 -->
+            <el-submenu :index="menu.id + ''" v-for="menu in menusList">
+              <template slot="title">
+                <i class="el-icon-location"></i>
+                <span>{{ menu.authName }}</span>
+              </template>
+              <!-- el-menu-item就是二级导航 -->
+              <el-menu-item :index="subMenu.path" v-for="subMenu in menu.children">{{ subMenu.authName }}</el-menu-item>
+            </el-submenu>
+          </el-menu>
+        </el-col>
+      </el-aside>
       <el-main>
+        <!-- 二级路由容器 -->
+        <router-view />
         <!-- 面包屑 -->
         <el-breadcrumb separator-class="el-icon-arrow-right">
           <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
@@ -127,13 +147,26 @@ export default {
         query: '',
         pagenum: 1,
         pagesize: 20
-      }
+      },
+      // 左侧菜单数据
+      menusList: []
     }
   },
   created() {
+    // 请求左侧菜单的接口
+    this.$http.get('menus').then(res => {
+      console.log('菜单返回的数据：', res)
+      this.menusList = res.data.data
+    })
     this.getUserData()
   },
   methods: {
+    handleOpen(key, keyPath) {
+      console.log(key, keyPath);
+    },
+    handleClose(key, keyPath) {
+      console.log(key, keyPath);
+    },
     // 编辑用户 - 打开模态框
     editOpen(user) {
       console.log('当前用户的信息：', user)
@@ -142,19 +175,19 @@ export default {
       // 打开编辑用户的模态框
       this.editDialogFormVisible = true
       // 用户数据的回填
-      
+
     },
     // 编辑用户 - 信息提交
     edit() {
-      
+
       // 请求编辑用户的接口
       /*
         @params id 请求路径中的参数path表示
         @params email 邮箱
         @params mobile 手机号
        */
-       this.$http.put(`users/${this.editUserForm.id}`,
-        this.editUserForm).then( res => {
+      this.$http.put(`users/${this.editUserForm.id}`,
+        this.editUserForm).then(res => {
           console.log(res)
           // 关闭模态框
           this.editDialogFormVisible = false
@@ -164,14 +197,14 @@ export default {
             this.$message.success(res.data.meta.msg)
             // 再次调用用户列表的方法
             this.getUserData()
-          } 
+          }
         })
     },
     // 搜索用户
     search() {
       this.$http.get('users', {
         params: this.usersParams,
-       
+
       }).then(res => {
         console.log('搜索结果：', res)
         let { users } = res.data.data
@@ -183,7 +216,7 @@ export default {
       // 请求用户列表的接口
       this.$http.get('users', {
         params: this.usersParams
-      }, ).then(res => {
+      },).then(res => {
         console.log(res)
         let { users } = res.data.data
         this.usersData = users
@@ -196,16 +229,16 @@ export default {
       // 发送添加用户的http请求
       this.$http.post(`users`,
         this.addUserForm).then(res => {
-        console.log('添加用户返回的数据：', res)
-        // 成功的判断
-        if (res.data.meta.status === 201) {
-          this.$message.success(res.data.meta.msg)
-          // 显示最新的添加的数据
-          this.getUserData()
-          return
-        }
+          console.log('添加用户返回的数据：', res)
+          // 成功的判断
+          if (res.data.meta.status === 201) {
+            this.$message.success(res.data.meta.msg)
+            // 显示最新的添加的数据
+            this.getUserData()
+            return
+          }
 
-      })
+        })
     },
     // 删除用户
     del(userId) {
@@ -217,7 +250,7 @@ export default {
         /*
          * @params id（你要删除的谁）？
          * */
-         this.$http.delete(`users/${userId}`).then(res => {
+        this.$http.delete(`users/${userId}`).then(res => {
           // 删除成功
           if (res.data.meta.status === 200) {
             this.$message({
@@ -304,5 +337,4 @@ body>.el-container {
   width: 100%;
   margin-top: 24px;
 }
-
 </style>
