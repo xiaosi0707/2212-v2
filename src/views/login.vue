@@ -14,7 +14,6 @@
 </template>
 
 <script>
-import Axios from 'axios'
 export default {
   data() {
     return {
@@ -47,21 +46,18 @@ export default {
     *
     * */
     login() {
-      Axios.post('http://shiyansong.cn:8888/api/private/v1/login',  {
+      this.$http.post('login',  {
         username: this.form.username,
         password: this.form.password
       }).then(res => {
         console.log('后端响应给前端的数据：', res)
         // 状态码===200就是成功了
         if (res.data.meta.status === 200) {
-          this.$message.success(res.data.meta.msg)
           // 把token存储在本地存储中
           localStorage.setItem('token', res.data.data.token)
           // 跳转到后台管理系统的主页
           this.$router.push('/main')
         } else {
-          // 错误的提示
-          this.$message.error(res.data.meta.msg)
           // 清空token
           localStorage.removeItem('token')
         }

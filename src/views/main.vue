@@ -98,7 +98,7 @@
   </el-container>
 </template>
 <script>
-import Axios from 'axios'
+
 export default {
   data() {
     return {
@@ -153,12 +153,8 @@ export default {
         @params email 邮箱
         @params mobile 手机号
        */
-      Axios.put(`http://shiyansong.cn:8888/api/private/v1/users/${this.editUserForm.id}`,
-        this.editUserForm, {
-          headers: {
-            'Authorization': localStorage.getItem('token')
-          }
-        }).then( res => {
+       this.$http.put(`users/${this.editUserForm.id}`,
+        this.editUserForm).then( res => {
           console.log(res)
           // 关闭模态框
           this.editDialogFormVisible = false
@@ -168,20 +164,14 @@ export default {
             this.$message.success(res.data.meta.msg)
             // 再次调用用户列表的方法
             this.getUserData()
-          } else {
-            this.$message.error(res.data.meta.msg)
-          }
-          // 编辑失败
+          } 
         })
     },
     // 搜索用户
     search() {
-      Axios.get('http://shiyansong.cn:8888/api/private/v1/users', {
+      this.$http.get('users', {
         params: this.usersParams,
-        // 配置请求头，携带token给服务端，让偶服务端认识我给我要的数据
-        headers: {
-          'Authorization': localStorage.getItem('token')
-        }
+       
       }).then(res => {
         console.log('搜索结果：', res)
         let { users } = res.data.data
@@ -191,12 +181,8 @@ export default {
     // 请求用户列表
     getUserData() {
       // 请求用户列表的接口
-      Axios.get('http://shiyansong.cn:8888/api/private/v1/users', {
-        params: this.usersParams,
-        // 配置请求头，携带token给服务端，让偶服务端认识我给我要的数据
-        headers: {
-          'Authorization': localStorage.getItem('token')
-        }
+      this.$http.get('users', {
+        params: this.usersParams
       }, ).then(res => {
         console.log(res)
         let { users } = res.data.data
@@ -208,12 +194,8 @@ export default {
       // 关闭添加用户的模态框
       this.dialogFormVisible = false
       // 发送添加用户的http请求
-      Axios.post(`http://shiyansong.cn:8888/api/private/v1/users`,
-        this.addUserForm, {
-          headers: {
-            'Authorization': localStorage.getItem('token')
-          }
-        }).then(res => {
+      this.$http.post(`users`,
+        this.addUserForm).then(res => {
         console.log('添加用户返回的数据：', res)
         // 成功的判断
         if (res.data.meta.status === 201) {
@@ -222,9 +204,6 @@ export default {
           this.getUserData()
           return
         }
-        // 错误的处理
-        this.$message.error(res.data.meta.msg)
-        // 再次调用请求用户列表的接口
 
       })
     },
@@ -238,11 +217,7 @@ export default {
         /*
          * @params id（你要删除的谁）？
          * */
-        Axios.delete(`http://shiyansong.cn:8888/api/private/v1/users/${userId}`, {
-          headers: {
-            'Authorization': localStorage.getItem('token')
-          }
-        }).then(res => {
+         this.$http.delete(`users/${userId}`).then(res => {
           // 删除成功
           if (res.data.meta.status === 200) {
             this.$message({
@@ -307,7 +282,6 @@ body>.el-container {
   line-height: 320px;
 }
 
-// 卡片
 .text {
   font-size: 14px;
 }
