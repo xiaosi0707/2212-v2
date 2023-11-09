@@ -1,5 +1,5 @@
 import Vue from 'vue' // 导入vue.js相当于
-import App from './App.vue' // 导入App.vue组件
+import App from './App' // 导入App.vue组件
 import ElementUI from 'element-ui';
 import { Message } from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
