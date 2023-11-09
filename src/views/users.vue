@@ -43,7 +43,8 @@
                                 @click="editOpen(scope.row)"></el-button>
                             <el-button type="danger" icon="el-icon-delete" size="mini"
                                 @click="del(scope.row.id)"></el-button>
-                            <el-button type="warning" icon="el-icon-setting" size="mini" @click="openSetRole(scope.row)"></el-button>
+                            <el-button type="warning" icon="el-icon-setting" size="mini"
+                                @click="openSetRole(scope.row)"></el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -101,16 +102,16 @@
                     当前的角色：{{ roleObj.role_name }}
                 </el-form-item>
                 <el-form-item label="新角色" :label-width="formLabelWidth">
-                    <p>value的值是：{{ value }}</p>
-                    <el-select v-model="value" placeholder="请选择">
-                        <el-option v-for="item in rolesList" :key="item.value" :label="item.roleName" :value="item.roleName">
+                    <p>value的值是：{{ roleId }}</p>
+                    <el-select v-model="roleId" placeholder="请选择">
+                        <el-option v-for="item in rolesList" :key="item.id" :label="item.roleName" :value="item.id">
                         </el-option>
                     </el-select>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="setRoleDialogFormVisible = false">取 消</el-button>
-                <el-button type="primary">确 定</el-button>
+                <el-button type="primary" @click="setNewRole">确 定</el-button>
             </div>
         </el-dialog>
         <!-- 分配角色的模态框 -->
@@ -122,7 +123,7 @@ export default {
     data() {
         return {
             // 分配角色下拉菜单选中的值
-            value: '',
+            roleId: '',
             // 分配角色模态框
             setRoleDialogFormVisible: false,
             // 收集编辑用户邮箱和手机号码
@@ -161,17 +162,31 @@ export default {
         this.getUserData()
     },
     methods: {
+        // 分配新角色的方法
+        /*
+            @params id 用户的id => roleObj.id
+            @params rid 角色id
+        */
+        setNewRole() {
+            this.$http.put(`users/${this.roleObj.id}/role`, {
+                rid: this.roleId
+            }).then(res => {
+                console.log(res)
+                // 关闭模态框
+                this.setRoleDialogFormVisible = false
+            })
+        },
         // 打开分配新角色的模态框
-      openSetRole(obj) {
-        // 把当前选中的角色信息赋值给roleObj
-        this.roleObj = obj
-        // 打开模态框
-        this.setRoleDialogFormVisible = true
-        this.$http.get('roles').then(res => {
-            console.log('角色列表：', res)
-            this.rolesList = res.data.data
-        })
-      },
+        openSetRole(obj) {
+            // 把当前选中的角色信息赋值给roleObj
+            this.roleObj = obj
+            // 打开模态框
+            this.setRoleDialogFormVisible = true
+            this.$http.get('roles').then(res => {
+                console.log('角色列表：', res)
+                this.rolesList = res.data.data
+            })
+        },
         // 编辑用户 - 打开模态框
         editOpen(user) {
             console.log('当前用户的信息：', user)
