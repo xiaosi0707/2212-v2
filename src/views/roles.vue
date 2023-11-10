@@ -47,7 +47,7 @@
           <template slot-scope="scope">
             <el-button type="primary" icon="el-icon-edit" size="mini"></el-button>
             <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
-            <el-button type="warning" icon="el-icon-setting" size="mini" @click="openSetRights"></el-button>
+            <el-button type="warning" icon="el-icon-setting" size="mini" @click="openSetRights(scope.row)"></el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -68,7 +68,7 @@
             default-expand-all -> 展开所有的节点
 
          -->
-      <el-tree :data="rightsList" show-checkbox node-key="id" default-expand-all :default-checked-keys="[5]" :props="defaultProps">
+      <el-tree :data="rightsList" show-checkbox node-key="id" default-expand-all :default-checked-keys="defaultChekedKeys" :props="defaultProps">
       </el-tree>
       <div slot="footer" class="dialog-footer">
         <el-button @click="setRightsDialogFormVisible = false">取 消</el-button>
@@ -91,7 +91,9 @@ export default {
       defaultProps: {
         children: 'children', // 后代节点的属性名
         label: 'authName'
-      }
+      },
+      // 当前角色默认的权限id
+      defaultChekedKeys: []
     }
   },
   created() {
@@ -101,19 +103,34 @@ export default {
     // 请求角色列表
     getRolesList() {
       this.$http.get(`roles`).then(res => {
-        console.log('角色列表数据：', res)
+       
         this.rolesList = res.data.data
       })
     },
     // 打开分配权限模态框
-    openSetRights() {
+    openSetRights(roleObj) {
+        console.log('当前角色信息：', roleObj)
       // 打开模态框
       this.setRightsDialogFormVisible = true
+      // 清空数组
+      this.defaultChekedKeys = []
       // 请求所有权限接口
       this.$http.get('rights/tree').then(res => {
-        console.log('所有权限接口返回的数据：', res)
         this.rightsList = res.data.data
       })
+      // 从当前角色中遍历出当前角色所拥有的权限id然后把id放到一个数组中
+     for(let i = 0; i < roleObj.children.length; i ++) {
+        console.log('一级权限遍历的结果：', roleObj.children[i])
+        this.defaultChekedKeys.push(roleObj.children[i].id)
+        for(let j = 0; j < roleObj.children[i].children.length; j++) {
+            console.log('二级权限遍历的结果：', roleObj.children[i].children[j])
+            this.defaultChekedKeys.push(roleObj.children[i].children[j].id)
+            for(let k = 0; k < roleObj.children[i].children[j].children.length; k++) {
+                console.log('三级权限遍历的结果：', roleObj.children[i].children[j].children[k])
+                this.defaultChekedKeys.push(roleObj.children[i].children[j].children[k].id)
+            }
+        }
+     }
     }
   }
 }
