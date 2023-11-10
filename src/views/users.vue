@@ -33,7 +33,7 @@
                     </el-table-column>
                     <el-table-column prop="mg_state" label="状态">
                         <template slot-scope="scope">
-                            <el-switch v-model="scope.row.mg_state">
+                            <el-switch v-model="scope.row.mg_state" @change="updateState(scope.row)">
                             </el-switch>
                         </template>
                     </el-table-column>
@@ -162,6 +162,19 @@ export default {
         this.getUserData()
     },
     methods: {
+        // 更新用户的状态
+        /*
+            @params uId 用户的id -> 点击的时候把当前用户的对象或用户的id传递过来
+            @params type 布尔值true或false -> 从传递进来的对象中获取状态的字段
+            没回答出来：
+                小黑
+                剑辉
+        */
+        updateState(userObj) {
+            this.$http.put(`users/${userObj.id}/state/${userObj.mg_state}`).then(res => {
+                console.log('更新状态后的返回值：', res)
+            })
+        },
         // 分配新角色的方法
         /*
             @params id 用户的id => roleObj.id
