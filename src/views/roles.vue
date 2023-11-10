@@ -18,24 +18,23 @@
         <el-table-column type="expand">
           <template slot-scope="props">
             <el-row v-for="item in props.row.children">
-                <!-- 一级权限 -->
-                <el-col :span="4" style="border-top: 1px solid #EBEEF5; border-radius: 0; padding-top: 10px;">
-                    <el-tag class="wyf-tag" closable>{{ item.authName }}</el-tag>
-                </el-col>
-                <el-col :span="20">
-                    <el-row v-for="item1 in item.children">
-                        <!-- 二级权限 -->
-                        <el-col :span="8" style="border-top: 1px solid #EBEEF5; border-radius: 0;padding-top: 10px;">
-                            <el-tag class="wyf-tag" type="success" closable>{{ item1.authName }}</el-tag>
-                        </el-col>
-                        <!-- 三级权限 -->
-                        <el-col :span="16" style="border-top: 1px solid #EBEEF5; border-radius: 0;padding-top: 10px;">
-                            <el-tag class="wyf-tag" type="warning" closable v-for="item2 in item1.children">{{ item2.authName }}</el-tag>
-                        </el-col>
-                    </el-row>
-                </el-col>
+              <!-- 一级权限 -->
+              <el-col :span="4" style="border-top: 1px solid #EBEEF5; border-radius: 0; padding-top: 10px;">
+                <el-tag class="wyf-tag" closable>{{ item.authName }}</el-tag>
+              </el-col>
+              <el-col :span="20">
+                <el-row v-for="item1 in item.children">
+                  <!-- 二级权限 -->
+                  <el-col :span="8" style="border-top: 1px solid #EBEEF5; border-radius: 0;padding-top: 10px;">
+                    <el-tag class="wyf-tag" type="success" closable>{{ item1.authName }}</el-tag>
+                  </el-col>
+                  <!-- 三级权限 -->
+                  <el-col :span="16" style="border-top: 1px solid #EBEEF5; border-radius: 0;padding-top: 10px;">
+                    <el-tag class="wyf-tag" type="warning" closable v-for="item2 in item1.children">{{ item2.authName }}</el-tag>
+                  </el-col>
+                </el-row>
+              </el-col>
             </el-row>
-            
           </template>
         </el-table-column>
         <el-table-column type="index" label="#" prop="id">
@@ -48,56 +47,51 @@
           <template slot-scope="scope">
             <el-button type="primary" icon="el-icon-edit" size="mini"></el-button>
             <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
-            <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
+            <el-button type="warning" icon="el-icon-setting" size="mini" @click="openSetRights"></el-button>
           </template>
         </el-table-column>
       </el-table>
     </el-card>
     <!-- 表格 -->
+    <!-- 分配权限模态框 -->
+    <el-dialog title="分配权限" :visible.sync="setRightsDialogFormVisible">
+      <!-- 
+            :data -> 数据源你要渲染的数组
+            show-checkbox -> 显示为复选框
+            node-key: 树形节点的唯一标识
+            :default-expanded-keys -> 默认 展开的节点
+            default-checked-keys -> 默认选中的节点 -> 
+            :props="defaultProps" -> props配置要显示的字段，具体显示的哪些字段需要在defaultProps这个对象中详细配置
+            defaultProps的配置：
+                label: 展示给用户的
+                children: 下一级节点的属性名
+            default-expand-all -> 展开所有的节点
+
+         -->
+      <el-tree :data="rightsList" show-checkbox node-key="id" default-expand-all :default-checked-keys="[5]" :props="defaultProps">
+      </el-tree>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="setRightsDialogFormVisible = false">取 消</el-button>
+        <el-button type="primary">确 定</el-button>
+      </div>
+    </el-dialog>
+    <!-- 分配权限模态框 -->
   </div>
 </template>
 <script>
 export default {
   data() {
     return {
-      tags: [
-        { name: '标签一', type: '' },
-      ],
       // 角色列表数据
       rolesList: [],
-      tableData: [{
-        id: '12987122',
-        name: '好滋好味鸡蛋仔',
-        category: '江浙小吃、小吃零食',
-        desc: '荷兰优质淡奶，奶香浓而不腻',
-        address: '上海市普陀区真北路',
-        shop: '王小虎夫妻店',
-        shopId: '10333'
-      }, {
-        id: '12987123',
-        name: '好滋好味鸡蛋仔',
-        category: '江浙小吃、小吃零食',
-        desc: '荷兰优质淡奶，奶香浓而不腻',
-        address: '上海市普陀区真北路',
-        shop: '王小虎夫妻店',
-        shopId: '10333'
-      }, {
-        id: '12987125',
-        name: '好滋好味鸡蛋仔',
-        category: '江浙小吃、小吃零食',
-        desc: '荷兰优质淡奶，奶香浓而不腻',
-        address: '上海市普陀区真北路',
-        shop: '王小虎夫妻店',
-        shopId: '10333'
-      }, {
-        id: '12987126',
-        name: '好滋好味鸡蛋仔',
-        category: '江浙小吃、小吃零食',
-        desc: '荷兰优质淡奶，奶香浓而不腻',
-        address: '上海市普陀区真北路',
-        shop: '王小虎夫妻店',
-        shopId: '10333'
-      }]
+      // 分配权限模态框显示/隐藏
+      setRightsDialogFormVisible: false,
+      // 所有权限数据
+      rightsList: [],
+      defaultProps: {
+        children: 'children', // 后代节点的属性名
+        label: 'authName'
+      }
     }
   },
   created() {
@@ -110,6 +104,16 @@ export default {
         console.log('角色列表数据：', res)
         this.rolesList = res.data.data
       })
+    },
+    // 打开分配权限模态框
+    openSetRights() {
+      // 打开模态框
+      this.setRightsDialogFormVisible = true
+      // 请求所有权限接口
+      this.$http.get('rights/tree').then(res => {
+        console.log('所有权限接口返回的数据：', res)
+        this.rightsList = res.data.data
+      })
     }
   }
 }
@@ -117,8 +121,9 @@ export default {
 </script>
 <style>
 .wyf-tag {
-    margin: 5px 12px 0 0;
+  margin: 5px 12px 0 0;
 }
+
 .demo-table-expand {
   font-size: 0;
 }
