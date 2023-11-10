@@ -41,7 +41,6 @@ const router = new VueRouter({
 //   }
 // }),
   router.beforeEach((to,from,next)=>{
-    console.log((to))
     if (to.path === "/main"){
       let a = localStorage.getItem('token')
       if (a){

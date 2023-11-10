@@ -18,7 +18,7 @@ const AXIOS = Axios.create({
 Vue.prototype.$http = AXIOS
 // 添加请求拦截器
 AXIOS.interceptors.request.use(function (config) {
-  console.log('触发了请求拦截器')
+
   config.headers.Authorization = localStorage.getItem('token')
   // 在发送请求之前做些什么
   return config;
@@ -29,7 +29,7 @@ AXIOS.interceptors.request.use(function (config) {
 
 // 添加响应拦截器
 AXIOS.interceptors.response.use(function (response) {
-  console.log('触发了响应拦截器', response)
+
   let { meta } = response.data
   // 提示处理
   if(meta.status === 200) {
