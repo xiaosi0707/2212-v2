@@ -118,19 +118,30 @@ export default {
       this.$http.get('rights/tree').then(res => {
         this.rightsList = res.data.data
       })
+      this.defaultRightsHandle(roleObj)
       // 从当前角色中遍历出当前角色所拥有的权限id然后把id放到一个数组中
-     for(let i = 0; i < roleObj.children.length; i ++) {
-        console.log('一级权限遍历的结果：', roleObj.children[i])
-        this.defaultChekedKeys.push(roleObj.children[i].id)
-        for(let j = 0; j < roleObj.children[i].children.length; j++) {
-            console.log('二级权限遍历的结果：', roleObj.children[i].children[j])
-            this.defaultChekedKeys.push(roleObj.children[i].children[j].id)
-            for(let k = 0; k < roleObj.children[i].children[j].children.length; k++) {
-                console.log('三级权限遍历的结果：', roleObj.children[i].children[j].children[k])
-                this.defaultChekedKeys.push(roleObj.children[i].children[j].children[k].id)
+     // for(let i = 0; i < roleObj.children.length; i ++) {
+     //    console.log('一级权限遍历的结果：', roleObj.children[i])
+     //    this.defaultChekedKeys.push(roleObj.children[i].id)
+     //    for(let j = 0; j < roleObj.children[i].children.length; j++) {
+     //        console.log('二级权限遍历的结果：', roleObj.children[i].children[j])
+     //        this.defaultChekedKeys.push(roleObj.children[i].children[j].id)
+     //        for(let k = 0; k < roleObj.children[i].children[j].children.length; k++) {
+     //            console.log('三级权限遍历的结果：', roleObj.children[i].children[j].children[k])
+     //            this.defaultChekedKeys.push(roleObj.children[i].children[j].children[k].id)
+     //        }
+     //    }
+     // }
+    },
+    // 默认权限的方式
+    defaultRightsHandle(roleObj) {
+        roleObj.children.map(item => {
+            if (item.children) { // 结束条件 -> 当没有children属性的时候结束递归
+                this.defaultRightsHandle(item)
+            } else {
+                this.defaultChekedKeys.push(item.id)
             }
-        }
-     }
+        })
     }
   }
 }
