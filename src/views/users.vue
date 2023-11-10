@@ -49,6 +49,19 @@
                     </el-table-column>
                 </el-table>
             </div>
+            <!-- 分页 
+                @size-change -> 每页条数发生了变化我就执行handleSizeChange方法
+                @current-change -> 当前页码发生变化就会执行handleCurrentChange方法
+                :page-sizes -> 配置每页多少条数据下拉菜单的数组
+                :current-page -> 
+                :total => 总条数
+            -->
+            <el-pagination 
+                @size-change="handleSizeChange" 
+                @current-change="handleCurrentChange"
+                :current-page="usersParams.pagenum" :page-sizes="[2, 4, 6, 8]"
+                layout="total, sizes, prev, pager, next, jumper" :total="usersListTotal">
+            </el-pagination>
         </el-card>
         <!-- 表格 -->
         <!-- 添加用户的模态框 -->
@@ -122,6 +135,10 @@
 export default {
     data() {
         return {
+            currentPage1: 5,
+            currentPage2: 5,
+            currentPage3: 5,
+            currentPage4: 4,
             // 分配角色下拉菜单选中的值
             roleId: '',
             // 分配角色模态框
@@ -150,8 +167,10 @@ export default {
             usersParams: {
                 query: '',
                 pagenum: 1,
-                pagesize: 20
+                pagesize: 2
             },
+            // 用户列表总条数
+            usersListTotal: 0,
             // 角色列表
             rolesList: [],
             // 分配角色数据回填
@@ -162,6 +181,21 @@ export default {
         this.getUserData()
     },
     methods: {
+        // 每页显示的条数发生变化就会执行这个方法
+        handleSizeChange(val) {
+            console.log(`每页 ${val} 条`);
+            // 每页显示多少条数据把分页组件下拉菜单中每页多少条的值取到然后赋值给我们请求用户列表中的pagesize字段这样分页组件的改变就会和用户列表数据发生了关联
+            this.usersParams.pagesize = val
+            //重新请求用户列表的数据
+            this.getUserData()
+        },
+        handleCurrentChange(val) {
+            // 分页组件的页码发生变化后的值就是当前是第几页，然后把这个值赋值给请求用户列表中的参数pagenum
+            this.usersParams.pagenum = val
+            console.log(`页码的改变触发了这个方法的执行；当前页: ${val}`);
+            //重新请求用户列表的数据
+            this.getUserData()
+        },
         // 更新用户的状态
         /*
             @params uId 用户的id -> 点击的时候把当前用户的对象或用户的id传递过来
@@ -173,6 +207,7 @@ export default {
         updateState(userObj) {
             this.$http.put(`users/${userObj.id}/state/${userObj.mg_state}`).then(res => {
                 console.log('更新状态后的返回值：', res)
+
             })
         },
         // 分配新角色的方法
@@ -251,7 +286,8 @@ export default {
                 params: this.usersParams
             },).then(res => {
                 console.log(res)
-                let { users } = res.data.data
+                let { users,total } = res.data.data
+                this.usersListTotal = total
                 this.usersData = users
             })
         },
