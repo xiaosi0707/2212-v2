@@ -120,6 +120,7 @@ export default {
     }
 }
 </script>
+
 <style>
 .demo-table-expand {
     font-size: 0;
@@ -135,4 +136,19 @@ export default {
     margin-bottom: 0;
     width: 50%;
 }
+
+
+.box-card {
+    margin-top: 12px;
+}
+
+.el-input-group {
+    width: 32%;
+    margin-right: 12px;
+}
+
+.custom-tag {
+    margin: 10px;
+}
+
 </style>
