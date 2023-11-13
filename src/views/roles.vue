@@ -68,11 +68,11 @@
             default-expand-all -> 展开所有的节点
 
          -->
-      <el-tree :data="rightsList" show-checkbox node-key="id" default-expand-all :default-checked-keys="defaultChekedKeys" :props="defaultProps">
+      <el-tree :data="rightsList" ref="tree" show-checkbox node-key="id" default-expand-all :default-checked-keys="defaultChekedKeys" :props="defaultProps">
       </el-tree>
       <div slot="footer" class="dialog-footer">
         <el-button @click="setRightsDialogFormVisible = false">取 消</el-button>
-        <el-button type="primary">确 定</el-button>
+        <el-button type="primary" @click="setRightsHandle">确 定</el-button>
       </div>
     </el-dialog>
     <!-- 分配权限模态框 -->
@@ -93,7 +93,9 @@ export default {
         label: 'authName'
       },
       // 当前角色默认的权限id
-      defaultChekedKeys: []
+      defaultChekedKeys: [],
+      // 角色信息
+      roleObj: {}
     }
   },
   created() {
@@ -103,13 +105,14 @@ export default {
     // 请求角色列表
     getRolesList() {
       this.$http.get(`roles`).then(res => {
-       
+
         this.rolesList = res.data.data
       })
     },
     // 打开分配权限模态框
     openSetRights(roleObj) {
-        console.log('当前角色信息：', roleObj)
+      console.log('当前角色信息：', roleObj)
+      this.roleObj = roleObj
       // 打开模态框
       this.setRightsDialogFormVisible = true
       // 清空数组
@@ -119,29 +122,32 @@ export default {
         this.rightsList = res.data.data
       })
       this.defaultRightsHandle(roleObj)
-      // 从当前角色中遍历出当前角色所拥有的权限id然后把id放到一个数组中
-     // for(let i = 0; i < roleObj.children.length; i ++) {
-     //    console.log('一级权限遍历的结果：', roleObj.children[i])
-     //    this.defaultChekedKeys.push(roleObj.children[i].id)
-     //    for(let j = 0; j < roleObj.children[i].children.length; j++) {
-     //        console.log('二级权限遍历的结果：', roleObj.children[i].children[j])
-     //        this.defaultChekedKeys.push(roleObj.children[i].children[j].id)
-     //        for(let k = 0; k < roleObj.children[i].children[j].children.length; k++) {
-     //            console.log('三级权限遍历的结果：', roleObj.children[i].children[j].children[k])
-     //            this.defaultChekedKeys.push(roleObj.children[i].children[j].children[k].id)
-     //        }
-     //    }
-     // }
     },
     // 默认权限的方式
     defaultRightsHandle(roleObj) {
-        roleObj.children.map(item => {
-            if (item.children) { // 结束条件 -> 当没有children属性的时候结束递归
-                this.defaultRightsHandle(item)
-            } else {
-                this.defaultChekedKeys.push(item.id)
-            }
-        })
+      roleObj.children.map(item => {
+        if (item.children) { // 结束条件 -> 当没有children属性的时候结束递归
+          this.defaultRightsHandle(item)
+        } else {
+          this.defaultChekedKeys.push(item.id)
+        }
+      })
+    },
+    // 分配权限（权限的编辑）
+    /*
+      @params roleId 角色id （你要给谁roleId分配什么权限rightsId）
+      @params rids   权限id
+     */
+    setRightsHandle() {
+      console.log('当前选中的节点的id', );
+      // 把获取到的权限的数组转为字符串传递给接口
+      const strId = this.$refs.tree.getCheckedKeys().concat(this.$refs.tree.getHalfCheckedKeys()).join()
+      console.log('拼接以后的数组：', strId)
+      this.$http.post(`roles/${this.roleObj.id}/rights`, {
+        rids: strId
+      }).then(res => {
+        console.log('返回的结果：', res)
+      })
     }
   }
 }
