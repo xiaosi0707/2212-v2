@@ -5,50 +5,47 @@ import Login from '../views/login.vue'
 import Main from '../views/main.vue'
 import Users from '../views/users.vue'
 import Roles from '../views/roles.vue'
+import Goods from '../views/goods.vue'
+import GoodsAdd from '../views/goods-add.vue'
 
 //3．创建路由的实例对象
 const router = new VueRouter({
-  routes: [
-    {
+  routes: [{
       path: "/",
       component: Login,
     },
     {
       path: '/main',
       component: Main,
-      children: [
-        {
+      children: [{
           path: '/users',
           component: Users
         },
         {
           path: '/roles',
           component: Roles
+        },
+        {
+          path: '/goods',
+          component: Goods
+        },
+        {
+          path: '/add',
+          component: GoodsAdd
         }
       ]
     }
   ],
 });
-// router.afterEach((to,from)=>{
-//   console.log(to)
-//   if(to.path=="/home"){
-//     let {token} = localStorage.getItem(token)
-//     if(token){
-//
-//     }else{
-//       next('/')
-//     }
-//   }
-// }),
-  router.beforeEach((to,from,next)=>{
-    if (to.path === "/main"){
-      let a = localStorage.getItem('token')
-      if (a){
-        next()
-      }else {
-          next('/')
-      }
+router.beforeEach((to, from, next) => {
+  if (to.path === "/main") {
+    let a = localStorage.getItem('token')
+    if (a) {
+      next()
+    } else {
+      next('/')
     }
-    next()
-  })
+  }
+  next()
+})
 export default router;
