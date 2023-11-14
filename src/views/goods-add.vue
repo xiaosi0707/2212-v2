@@ -24,38 +24,40 @@
       </el-steps>
       <!-- 步骤条 -->
       <!-- 标签页 -->
-      <el-tabs :tab-position="tabPosition">
+      <el-tabs :tab-position="tabPosition" @tab-click="selectedTab">
         <el-tab-pane label="基本信息">
           <el-form label-position="top" label-width="80px">
             <el-form-item label="商品名称">
-              <el-input></el-input>
+              <el-input v-model="addGoodsRequest.goods_name"></el-input>
             </el-form-item>
             <el-form-item label="商品价格">
-              <el-input></el-input>
+              <el-input v-model="addGoodsRequest.goods_price"></el-input>
             </el-form-item>
             <el-form-item label="商品重量">
-              <el-input></el-input>
+              <el-input v-model="addGoodsRequest.goods_weight"></el-input>
             </el-form-item>
             <el-form-item label="商品数量">
-              <el-input></el-input>
+              <el-input v-model="addGoodsRequest.goods_number"></el-input>
             </el-form-item>
             <el-form-item label="商品分类">
-              <el-cascader v-model="value" :options="options" :props="{ expandTrigger: 'hover' }" @change="handleChange"></el-cascader>
+             
+              <!-- 
+                :options 渲染的数据源 array
+               -->
+              <el-cascader 
+               
+                :options="catList" 
+                :props="defaultProps" 
+                @change="handleChange"></el-cascader>
             </el-form-item>
           </el-form>
         </el-tab-pane>
         <el-tab-pane label="商品参数">
           <el-form label-position="top" label-width="80px">
-            <el-form-item label="版式">
-              <el-checkbox v-model="checked1" label="备选项1" border></el-checkbox>
-              <el-checkbox v-model="checked2" label="备选项2" border></el-checkbox>
+            <el-form-item :label="item.attr_name" v-for="item in manyAttrs">
+              <el-checkbox v-model="checked1" :label="item.attr_vals" border></el-checkbox>
             </el-form-item>
-            <el-form-item label="内存">
-              <el-checkbox v-model="checked1" label="备选项1" border></el-checkbox>
-            </el-form-item>
-            <el-form-item label="CPU主频">
-              <el-checkbox v-model="checked1" label="备选项1" border></el-checkbox>
-            </el-form-item>
+            
           </el-form>
         </el-tab-pane>
         <el-tab-pane label="商品属性">
@@ -82,6 +84,7 @@
         </el-tab-pane>
         <el-tab-pane label="商品内容">
           <quill-editor></quill-editor>
+          <el-button type="primary" style="margin-top: 24px;" @click="addGoods">添加商品</el-button>
         </el-tab-pane>
       </el-tabs>
       <!-- 标签页 -->
@@ -99,6 +102,24 @@ export default {
   components: { quillEditor },
   data() {
     return {
+      // 收集添加商品的请求参数
+      addGoodsRequest: {
+        goods_name: '',
+        goods_price: '',
+        goods_number: '',
+        goods_weight: '',
+        goods_cat: ''
+      },
+      // 所有的分类
+      catList: [],
+      // 级联选择器的配置
+      defaultProps: {
+        expandTrigger: 'hover',
+        label: 'cat_name',
+        value: 'cat_id'
+      },
+      // 动态参数
+      manyAttrs: [],
       active: 0,
       // 标签页的位置（上下左右）
       tabPosition: 'left',
@@ -107,217 +128,56 @@ export default {
       /* 商品基本信息表单数据 */
       /* 商品基本信息表单数据 */
 
-      /*级联选择器*/
-      value: [],
-      options: [{
-        value: 'zhinan',
-        label: '指南',
-        children: [{
-          value: 'shejiyuanze',
-          label: '设计原则',
-          children: [{
-            value: 'yizhi',
-            label: '一致'
-          }, {
-            value: 'fankui',
-            label: '反馈'
-          }, {
-            value: 'xiaolv',
-            label: '效率'
-          }, {
-            value: 'kekong',
-            label: '可控'
-          }]
-        }, {
-          value: 'daohang',
-          label: '导航',
-          children: [{
-            value: 'cexiangdaohang',
-            label: '侧向导航'
-          }, {
-            value: 'dingbudaohang',
-            label: '顶部导航'
-          }]
-        }]
-      }, {
-        value: 'zujian',
-        label: '组件',
-        children: [{
-          value: 'basic',
-          label: 'Basic',
-          children: [{
-            value: 'layout',
-            label: 'Layout 布局'
-          }, {
-            value: 'color',
-            label: 'Color 色彩'
-          }, {
-            value: 'typography',
-            label: 'Typography 字体'
-          }, {
-            value: 'icon',
-            label: 'Icon 图标'
-          }, {
-            value: 'button',
-            label: 'Button 按钮'
-          }]
-        }, {
-          value: 'form',
-          label: 'Form',
-          children: [{
-            value: 'radio',
-            label: 'Radio 单选框'
-          }, {
-            value: 'checkbox',
-            label: 'Checkbox 多选框'
-          }, {
-            value: 'input',
-            label: 'Input 输入框'
-          }, {
-            value: 'input-number',
-            label: 'InputNumber 计数器'
-          }, {
-            value: 'select',
-            label: 'Select 选择器'
-          }, {
-            value: 'cascader',
-            label: 'Cascader 级联选择器'
-          }, {
-            value: 'switch',
-            label: 'Switch 开关'
-          }, {
-            value: 'slider',
-            label: 'Slider 滑块'
-          }, {
-            value: 'time-picker',
-            label: 'TimePicker 时间选择器'
-          }, {
-            value: 'date-picker',
-            label: 'DatePicker 日期选择器'
-          }, {
-            value: 'datetime-picker',
-            label: 'DateTimePicker 日期时间选择器'
-          }, {
-            value: 'upload',
-            label: 'Upload 上传'
-          }, {
-            value: 'rate',
-            label: 'Rate 评分'
-          }, {
-            value: 'form',
-            label: 'Form 表单'
-          }]
-        }, {
-          value: 'data',
-          label: 'Data',
-          children: [{
-            value: 'table',
-            label: 'Table 表格'
-          }, {
-            value: 'tag',
-            label: 'Tag 标签'
-          }, {
-            value: 'progress',
-            label: 'Progress 进度条'
-          }, {
-            value: 'tree',
-            label: 'Tree 树形控件'
-          }, {
-            value: 'pagination',
-            label: 'Pagination 分页'
-          }, {
-            value: 'badge',
-            label: 'Badge 标记'
-          }]
-        }, {
-          value: 'notice',
-          label: 'Notice',
-          children: [{
-            value: 'alert',
-            label: 'Alert 警告'
-          }, {
-            value: 'loading',
-            label: 'Loading 加载'
-          }, {
-            value: 'message',
-            label: 'Message 消息提示'
-          }, {
-            value: 'message-box',
-            label: 'MessageBox 弹框'
-          }, {
-            value: 'notification',
-            label: 'Notification 通知'
-          }]
-        }, {
-          value: 'navigation',
-          label: 'Navigation',
-          children: [{
-            value: 'menu',
-            label: 'NavMenu 导航菜单'
-          }, {
-            value: 'tabs',
-            label: 'Tabs 标签页'
-          }, {
-            value: 'breadcrumb',
-            label: 'Breadcrumb 面包屑'
-          }, {
-            value: 'dropdown',
-            label: 'Dropdown 下拉菜单'
-          }, {
-            value: 'steps',
-            label: 'Steps 步骤条'
-          }]
-        }, {
-          value: 'others',
-          label: 'Others',
-          children: [{
-            value: 'dialog',
-            label: 'Dialog 对话框'
-          }, {
-            value: 'tooltip',
-            label: 'Tooltip 文字提示'
-          }, {
-            value: 'popover',
-            label: 'Popover 弹出框'
-          }, {
-            value: 'card',
-            label: 'Card 卡片'
-          }, {
-            value: 'carousel',
-            label: 'Carousel 走马灯'
-          }, {
-            value: 'collapse',
-            label: 'Collapse 折叠面板'
-          }]
-        }]
-      }, {
-        value: 'ziyuan',
-        label: '资源',
-        children: [{
-          value: 'axure',
-          label: 'Axure Components'
-        }, {
-          value: 'sketch',
-          label: 'Sketch Templates'
-        }, {
-          value: 'jiaohu',
-          label: '组件交互文档'
-        }]
-      }],
+      /*级联选择器当前选中分类id*/
+      catId: [],
       checked1: true,
       checked2: false,
     };
   },
+  created() {
+    // 请求所有分类的数据
+    this.$http.get('categories').then(res => {
+      console.log('所有分类的数据：', res)
+      let { data } = res.data
+      this.catList = data
 
+    })
+  },
   methods: {
+    // 级联选择器选中的值改变后触发该方法
     handleChange(value) {
-      console.log(value);
+      console.log('当前选中的分类：', value);
+      this.addGoodsRequest.goods_cat = value.join()
     },
     handleRemove(file, fileList) {
       console.log(file, fileList);
     },
     handlePreview(file) {
       console.log(file);
+    },
+    // 添加商品
+    addGoods() {
+      this.$http.post('goods', this.addGoodsRequest).then(res => {
+        console.log('添加商品成功：', res)
+      })
+    },
+    // 被选中的标签方法
+    selectedTab(args) {
+      let { index } = args
+      // 请求动态参数
+      if (index === '1') {
+        this.$http.get(`categories/${this.addGoodsRequest.goods_cat[this.addGoodsRequest.goods_cat.length - 1]}/attributes`, {
+          params: {
+            sel: 'many'
+          }
+        }).then(res => {
+          console.log('返回的动态参数：', res)
+          let { data } = res.data
+          this.manyAttrs = data
+        })
+        // statement
+      }
+
     }
   }
 }
