@@ -40,40 +40,29 @@
               <el-input v-model="addGoodsRequest.goods_number"></el-input>
             </el-form-item>
             <el-form-item label="商品分类">
-             
               <!-- 
                 :options 渲染的数据源 array
                -->
-              <el-cascader 
-               
-                :options="catList" 
-                :props="defaultProps" 
-                @change="handleChange"></el-cascader>
+              <el-cascader :options="catList" :props="defaultProps" @change="handleChange"></el-cascader>
             </el-form-item>
           </el-form>
         </el-tab-pane>
         <el-tab-pane label="商品参数">
           <el-form label-position="top" label-width="80px">
             <el-form-item :label="item.attr_name" v-for="item in manyAttrs">
-              <el-checkbox v-model="checked1" :label="item.attr_vals" border></el-checkbox>
+              <p>当前选中的checkbox的值：{{ checkedList }}</p>
+              <el-checkbox-group v-model="checkedList">
+                <el-checkbox v-for="attr in item.attr_vals.split(' ')" :label="attr" border></el-checkbox>
+              </el-checkbox-group>
             </el-form-item>
-            
           </el-form>
         </el-tab-pane>
         <el-tab-pane label="商品属性">
           <el-form label-position="top" label-width="80px">
-            <el-form-item label="商品名称">
-              <el-input></el-input>
+            <el-form-item :label="item.attr_name" v-for="item in onlyAttrs">
+              <el-input v-model="item.attr_vals"></el-input>
             </el-form-item>
-            <el-form-item label="商品价格">
-              <el-input></el-input>
-            </el-form-item>
-            <el-form-item label="商品重量">
-              <el-input></el-input>
-            </el-form-item>
-            <el-form-item label="商品数量">
-              <el-input></el-input>
-            </el-form-item>
+            
           </el-form>
         </el-tab-pane>
         <el-tab-pane label="商品图片">
@@ -102,13 +91,19 @@ export default {
   components: { quillEditor },
   data() {
     return {
-      // 收集添加商品的请求参数
+      // 多个复选框被选中的值
+      checkedList: [],
+      /*
+        必传请求参数：goods_name、goods_price、goods_number、goods_weight、goods_cat
+        非必传请求参数：goods_introduce、pics、attrs
+       */
       addGoodsRequest: {
         goods_name: '',
         goods_price: '',
         goods_number: '',
         goods_weight: '',
-        goods_cat: ''
+        goods_cat: '',
+        attrs: []
       },
       // 所有的分类
       catList: [],
@@ -120,6 +115,8 @@ export default {
       },
       // 动态参数
       manyAttrs: [],
+      // 静态属性
+      onlyAttrs: [],
       active: 0,
       // 标签页的位置（上下左右）
       tabPosition: 'left',
@@ -130,8 +127,7 @@ export default {
 
       /*级联选择器当前选中分类id*/
       catId: [],
-      checked1: true,
-      checked2: false,
+     
     };
   },
   created() {
@@ -157,6 +153,41 @@ export default {
     },
     // 添加商品
     addGoods() {
+      /*
+        this.addGoodsRequest这个对象中现在我们获取到的值有：
+        goods_name
+        goods_number
+        goods_weight
+        goods_price
+        goods_cat
+
+        attrs现在获取到了也渲染了，但是怎么取到你选中的动态参数？
+       */
+      // 处理动态参数
+      this.addGoodsRequest.attrs = []
+      // 遍历数据源（从数据源中查找当前选中的动态参数名）
+      this.manyAttrs.map((item, index) => {
+
+        // 遍历当前选中的动态参数名儿
+        this.checkedList.map((item1, index1) => {
+
+          // 在manyAttrs中的attr_vals中有没有当前选中的动态参数的名字
+          if (item.attr_vals.indexOf(item1) !== -1) {
+            // 去重你要再次检查在addGoodsRequest.attrs数组中是否已经存在某个对象
+
+            if (this.addGoodsRequest.attrs.indexOf(item) === -1) {
+              // 重新组合数据结构 attr_id和attr_values
+              let newObj = {
+                'attr_id': item.attr_id,
+                'attr_value': item.attr_vals
+              }
+              this.addGoodsRequest.attrs[index1] = newObj
+            }
+          }
+        })
+      })
+      console.log('处理完毕后的数据：', this.addGoodsRequest.attrs)
+
       this.$http.post('goods', this.addGoodsRequest).then(res => {
         console.log('添加商品成功：', res)
       })
@@ -175,7 +206,21 @@ export default {
           let { data } = res.data
           this.manyAttrs = data
         })
-        // statement
+        
+      }
+      // 请求静态属性
+      // 请求动态参数
+      if (index === '2') {
+        this.$http.get(`categories/${this.addGoodsRequest.goods_cat[this.addGoodsRequest.goods_cat.length - 1]}/attributes`, {
+          params: {
+            sel: 'only'
+          }
+        }).then(res => {
+          console.log('返回的静态属性：', res)
+          let { data } = res.data
+          this.onlyAttrs = data
+        })
+        
       }
 
     }
