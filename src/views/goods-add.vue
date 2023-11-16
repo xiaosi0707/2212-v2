@@ -62,11 +62,15 @@
             <el-form-item :label="item.attr_name" v-for="item in onlyAttrs">
               <el-input v-model="item.attr_vals"></el-input>
             </el-form-item>
-            
           </el-form>
         </el-tab-pane>
         <el-tab-pane label="商品图片">
-          <el-upload class="upload-demo" action="https://jsonplaceholder.typicode.com/posts/" :on-preview="handlePreview" :on-remove="handleRemove" :file-list="fileList" list-type="picture">
+          <!-- 
+            action 上传路径 必传
+            on-preview 点击文件列表中的文件触发的属性
+            on-remove 点击文件列表中的文件删除按钮触发的属性
+           -->
+          <el-upload class="upload-demo" action="http://43.138.15.137:7001/api/private/v1/upload" :on-preview="handlePreview" :headers="headersObj" :on-remove="handleRemove" :file-list="fileList" :on-success="successHandle" list-type="picture">
             <el-button size="small" type="primary">点击上传</el-button>
             <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
           </el-upload>
@@ -91,6 +95,10 @@ export default {
   components: { quillEditor },
   data() {
     return {
+      // 上传图片鉴权
+      headersObj: {
+        'Authorization': localStorage.getItem('token')
+      },
       // 多个复选框被选中的值
       checkedList: [],
       /*
@@ -127,7 +135,7 @@ export default {
 
       /*级联选择器当前选中分类id*/
       catId: [],
-     
+
     };
   },
   created() {
@@ -145,11 +153,17 @@ export default {
       console.log('当前选中的分类：', value);
       this.addGoodsRequest.goods_cat = value.join()
     },
+    // 删除文件钩子
     handleRemove(file, fileList) {
       console.log(file, fileList);
     },
+    // 预览文件的钩子
     handlePreview(file) {
       console.log(file);
+    },
+    // 上传文件成功的钩子
+    successHandle(response, file, fileList) {
+      console.log('文件上传成功后的三个参数：', response, file, fileList)
     },
     // 添加商品
     addGoods() {
@@ -181,13 +195,24 @@ export default {
                 'attr_id': item.attr_id,
                 'attr_value': item.attr_vals
               }
-              this.addGoodsRequest.attrs[index1] = newObj
+              // 把按照接口要求的格式处理完毕放到this.addGoodsRequest.attrs这个数组当中
+              this.addGoodsRequest.attrs.push(newObj)
             }
           }
         })
       })
-      console.log('处理完毕后的数据：', this.addGoodsRequest.attrs)
+      // 处理静态属性
+      this.onlyAttrs.map((item, i) => {
+        // 重新组合数据结构 attr_id和attr_values
+        let newObj = {
+          'attr_id': item.attr_id,
+          'attr_value': item.attr_vals
+        }
+        // 把按照接口要求的格式处理完毕放到this.addGoodsRequest.attrs这个数组当中
+        this.addGoodsRequest.attrs.push(newObj)
+      })
 
+      // 请求添加商品的接口
       this.$http.post('goods', this.addGoodsRequest).then(res => {
         console.log('添加商品成功：', res)
       })
@@ -206,7 +231,7 @@ export default {
           let { data } = res.data
           this.manyAttrs = data
         })
-        
+
       }
       // 请求静态属性
       // 请求动态参数
@@ -220,7 +245,7 @@ export default {
           let { data } = res.data
           this.onlyAttrs = data
         })
-        
+
       }
 
     }
