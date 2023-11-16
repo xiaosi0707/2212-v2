@@ -7,6 +7,7 @@ import Users from '../views/users.vue'
 import Roles from '../views/roles.vue'
 import Goods from '../views/goods.vue'
 import GoodsAdd from '../views/goods-add.vue'
+import Params from '../views/params.vue'
 
 //3．创建路由的实例对象
 const router = new VueRouter({
@@ -32,6 +33,10 @@ const router = new VueRouter({
         {
           path: '/add',
           component: GoodsAdd
+        },
+         {
+          path: '/params',
+          component: Params
         }
       ]
     }
