@@ -4,73 +4,96 @@
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>商品管理</el-breadcrumb-item>
-      <el-breadcrumb-item>商品添加</el-breadcrumb-item>
+      <el-breadcrumb-item>分类参数</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 面包屑 -->
     <!-- 表格 -->
     <el-card class="box-card">
       <!-- 提示 -->
-      <el-alert title="添加商品信息" type="info" center show-icon :closable="false">
+      <el-alert title="注意：只允许为第三级分类设置相关参数！" type="warning" show-icon :closable="false">
       </el-alert>
-      <el-cascader v-model="selectedCatId" :options="catList" :props="defaultProps" @change="handleChange"></el-cascader>
+      <!-- 提示 -->
+      <!-- 级联选择器 -->
+      选择商品分类：{{ catIdArr }}
+      <el-cascader v-model="catIdArr" style="margin-top: 20px" :options="catList" :props="defaultProps" @change="selectedCatId"></el-cascader>
+      <!-- 级联选择器 -->
+      <!-- 标签页 -->
       <el-tabs v-model="activeName" @tab-click="handleClick">
         <el-tab-pane label="动态参数" name="first">
-          <el-button type="primary" size="mini" @click="manyDialogFormVisible=true">添加参数</el-button>
+          <el-button type="primary" size="mini" @click="paramsDialogFormVisible = true">添加参数</el-button>
+          <el-table :data="manyAttrs" style="margin-top: 12px;width: 100%" border>
+            <el-table-column type="expand">
+              <template slot-scope="props">
+                <el-form label-position="left" inline class="demo-table-expand">
+                  <el-form-item label="">
+                    <!-- tag -->
+                    <el-tag v-for="item in props.row.attr_vals.split(' ')" closable :disable-transitions="false" @close="handleClose(tag)">
+                      {{ item }}
+                    </el-tag>
+                    <el-input class="input-new-tag" v-if="inputVisible" v-model="inputValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm" @blur="handleInputConfirm">
+                    </el-input>
+                    <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Tag</el-button>
+                    <!-- tag -->
+                  </el-form-item>
+                </el-form>
+              </template>
+            </el-table-column>
+            <el-table-column type="index" label="">
+            </el-table-column>
+            <el-table-column label="参数名称" prop="attr_name">
+            </el-table-column>
+            <el-table-column label="操作" prop="">
+              <template slot-scope="scope">
+                <el-button type="primary" icon="el-icon-edit" size="mini">修改</el-button>
+                <el-button type="danger" icon="el-icon-delete" size="mini">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
         </el-tab-pane>
-        <el-tab-pane label="静态属性" name="second">
-          <el-button type="primary">添加参数</el-button>
-        </el-tab-pane>
-        <el-table :data="manyAttrs" style="width: 100%" border>
-          <el-table-column type="expand">
-            <template slot-scope="props">
-              <el-form label-position="left" inline class="demo-table-expand">
-                <el-form-item label="">
-                  <el-tag v-for="item in props.row.attr_vals" closable :disable-transitions="false" @close="handleClose(tag)">
-                    {{ item }}
-                  </el-tag>
-                  <el-input class="input-new-tag" v-if="props.row.inputVisible" v-model="props.row.inputValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm(props.row)" @blur="handleInputConfirm(props.row)">
-                  </el-input>
-                  <el-button v-else class="button-new-tag" size="small" @click="showInput(props.row)">+ New Tag</el-button>
-                </el-form-item>
-              </el-form>
-            </template>
-          </el-table-column>
-          <el-table-column label="" type="index">
-          </el-table-column>
-          <el-table-column label="参数名称" prop="attr_name">
-          </el-table-column>
-          <el-table-column label="操作" prop="desc">
-          </el-table-column>
-        </el-table>
+        <el-tab-pane label="静态属性" name="second">静态属性</el-tab-pane>
       </el-tabs>
+      <!-- 标签页 -->
+    </el-card>
     </el-card>
     <!-- 表格 -->
-    <!-- 添加动态参数 -->
-    <el-dialog title="添加参数" :visible.sync="manyDialogFormVisible">
+    <!-- 添加参数的模态框 -->
+    <el-dialog title="添加参数" :visible.sync="paramsDialogFormVisible">
       <el-form>
-        <el-form-item label="参数名" :label-width="formLabelWidth">
-          <el-input v-model="manyVal" autocomplete="off"></el-input>
+        <el-form-item label="动态参数" :label-width="formLabelWidth">
+          <el-input v-model="addManyAttr.attr_name" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="manyDialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addManyAttrs">确 定</el-button>
+        <el-button @click="paramsDialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addMany">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 添加参数的模态框 -->
   </div>
 </template>
 <script>
 export default {
+
   data() {
     return {
-      manyDialogFormVisible: false,
-      manyVal: '',
-      selectedCatId: [],
-      manyAttrs: [],
-
+      // 参数名称
+      addManyAttr: {
+        attr_name: '',
+        attr_sel: 'many',
+        attr_vals: '甜的 咸的 酸的'
+      },
+      // label的宽度 - 添加用户
+      formLabelWidth: '100px',
+      // 添加参数模态框
+      paramsDialogFormVisible: false,
+      // 分类id
+      catIdArr: [],
+      // 标签页
       activeName: 'first',
       // 所有的分类
       catList: [],
+      // 动态参数
+      manyAttrs: [],
       // 级联选择器的配置
       defaultProps: {
         expandTrigger: 'hover',
@@ -80,9 +103,7 @@ export default {
       dynamicTags: ['标签一', '标签二', '标签三'],
       inputVisible: false,
       inputValue: '',
-      formLabelWidth: '120px',
-
-    }
+    };
   },
   created() {
     // 请求所有分类的数据
@@ -90,102 +111,52 @@ export default {
       console.log('所有分类的数据：', res)
       let { data } = res.data
       this.catList = data
-
     })
   },
   methods: {
-    addManyAttrs() {
-
-      this.$http.post(`categories/${this.selectedCatId[this.selectedCatId.length - 1]}/attributes`, {
-        attr_name: this.manyVal,
-        attr_sel: 'many'
-      }).then(res => {
-        console.log(res)
-        let { data, meta } = res.data
-        // 失败
-        if (meta.status !== 201) return this.$message.error(meta.msg)
-        // 成功
-        this.$message.success(meta.msg)
-        // 再次请求动态参数数据
-        this.handleChange()
-        // 关闭模态框
-        this.manyDialogFormVisible = false
-
-      })
-    },
     handleClick(tab, event) {
       console.log(tab, event);
     },
-    showInput(obj) {
-      obj.inputVisible = true;
+    handleClose(tag) {
+      this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
+    },
+
+    showInput() {
+      this.inputVisible = true;
       this.$nextTick(_ => {
         this.$refs.saveTagInput.$refs.input.focus();
       });
     },
 
-    handleInputConfirm(obj) {
-      // 通过传参拿到请求接口需要的两个参数
-      let { attr_id, many, attr_name, attr_vals, inputValue, inputVisible } = obj
-      // 如果用户什么都没有输入，则直接return
-      if (inputValue.trim().length <= 0) {
-        inputValue = ''
-        inputVisible = false
-        return
+    handleInputConfirm() {
+      let inputValue = this.inputValue;
+      if (inputValue) {
+        this.dynamicTags.push(inputValue);
       }
-      // 获取到用户输入的内容，并保存到attr_vals中
-      attr_vals.push(inputValue)
-
-
-      // 请求添加动态参数的接口
-      /*
-          id：分类id -> 级联选择器已经选过了这个是现成的selectedCatArr:[]
-          attr_id：属性id -> 通过scope.row作为参数传递进来在执行handleInputConfirm这个方法的时候
-          attr_name：版式/内存/cpu主频
-          attr_sel：属性类型many/only
-          attr_vals：参数的属性值
-      */
-      this.$http.put(`categories/${this.selectedCatId[this.selectedCatId.length - 1]}/attributes/${attr_id}`, {
-        attr_name: attr_name,
-        attr_sel: 'many',
-        attr_vals: attr_vals.join(' ') // 接口文档要求转为字符串
-      }).then(res => {
-        console.log(res)
-        // 再次请求动态参数数据
-        let { meta, data } = res.data
-        if (meta.status !== 200) return this.$message.error(meta.msg)
-        this.$message.success(meta.msg)
-        // 再次请求动态参数数据
-        // this.getManyAttrs()
-      })
-
-      obj.inputVisible = false;
-      obj.inputValue = '';
+      this.inputVisible = false;
+      this.inputValue = '';
     },
-    handleChange(value) {
-      console.log(value);
-      /*
-        id: 三级分类的分类id -> this.selectedCatId
-        sel: many或only -> 是动态还是静态
+    // 分类的级联选择器改变值触发
+    selectedCatId(arr) {
 
-       */
-      this.$http.get(`categories/${this.selectedCatId[this.selectedCatId.length - 1]}/attributes`, {
-        params: {
-          sel: 'many' // 是动态还是静态
-        }
-      }).then(res => {
-        console.log(res)
-        let { data, meta } = res.data
-        data.map(item => {
-          // 如果为空，则 不进行分割，直接返回一个空数据，表示没有可选项；
-          item.attr_vals = item.attr_vals ? item.attr_vals.split(' ') : []
-          // 控制tag显示还是隐藏的字段
-          item.inputVisible = false
-          // 获取new tag里面的值的字段
-          item.inputValue = ''
+      if (arr.length) {
+        // 发送请求动态参数
+        this.$http.get(`categories/${arr[arr.length - 1]}/attributes`, {
+          params: {
+            sel: 'many'
+          }
+        }).then(res => {
+          console.log('动态参数返回的结果：', res)
+          this.manyAttrs = res.data.data
         })
-        // 赋值给manyAttrs
-        this.manyAttrs = data
 
+      }
+    },
+    // 添加动态参数
+    addMany() {
+      this.$http.post(`categories/${this.catIdArr[this.catIdArr.length - 1]}/attributes`, this.addManyAttr).then(res => {
+        console.log('添加动态参数的返回值：', res)
+        this.paramsDialogFormVisible = false
       })
     }
   }
@@ -193,6 +164,21 @@ export default {
 
 </script>
 <style scoped>
+.demo-table-expand {
+  font-size: 0;
+}
+
+.demo-table-expand label {
+  width: 90px;
+  color: #99a9bf;
+}
+
+.demo-table-expand .el-form-item {
+  margin-right: 0;
+  margin-bottom: 0;
+  width: 50%;
+}
+
 .el-tag+.el-tag {
   margin-left: 10px;
 }
