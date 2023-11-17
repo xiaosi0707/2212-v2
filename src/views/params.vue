@@ -24,20 +24,16 @@
           <el-table :data="manyAttrs" style="margin-top: 12px;width: 100%" border>
             <el-table-column type="expand">
               <template slot-scope="props">
-
                 <el-form label-position="left" inline class="demo-table-expand">
                   <el-form-item label="">
-
                     <!-- 动态参数值 -->
                     <el-tag v-for="item in props.row.attr_vals.split(' ')" closable :disable-transitions="false" @close="handleClose(tag)">
                       {{ item }}
                     </el-tag>
-
-                    <el-input class="input-new-tag" v-if="props.row.inputVisible" v-model="inputValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm" @blur="handleInputConfirm">
+                    <el-input class="input-new-tag" v-if="props.row.inputVisible" v-model="props.row.inputValue" ref="saveTagInput" size="small" @keyup.enter.native="$event.target.blur()" @blur="handleInputConfirm(props.row)">
                     </el-input>
                     <el-button v-else class="button-new-tag" size="small" @click="showInput(props.row)">+ New Tag</el-button>
                     <!-- 动态参数值 -->
-
                   </el-form-item>
                 </el-form>
               </template>
@@ -132,38 +128,65 @@ export default {
         this.$refs.saveTagInput.$refs.input.focus();
       });
     },
+    // 发送添加动态参数值的请求 执行这个方法：敲回车和失焦
+    handleInputConfirm(objMany) {
+      console.log('动态参数对象：', objMany)
+      // 请求接口
+      /*
+        id 分类的id ?
+        attrId 属性id
+        attr_name 新属性的名字 获取
+        attr_sel 参数类型many
+        attr_vals 动态参数的属性值
+       */
+      this.addManyAttrs(objMany)
 
-    handleInputConfirm() {
-      let inputValue = this.inputValue;
-      if (inputValue) {
-        this.dynamicTags.push(inputValue);
-      }
-      this.inputVisible = false;
-      this.inputValue = '';
+    },
+    // 添加动态参数接口
+    addManyAttrs(objMany) {
+      let { cat_id, attr_id, attr_name, attr_vals, inputValue } = objMany
+      this.$http.put(`categories/${cat_id}/attributes/${attr_id}`, {
+        attr_name: attr_name,
+        attr_sel: 'many',
+        attr_vals: attr_vals + ' ' + inputValue
+      }).then(res => {
+        console.log('添加动态参数值的返回值：', res)
+
+        // 隐藏当前对象上面的inputVisible
+        objMany.inputVisible = false;
+        // 清空当前对象上面的inputValue值
+        objMany.inputValue = '';
+        // 再次请求动态参数的值就不用手动刷新了
+        this.getManyAttrs()
+      })
     },
     // 分类的级联选择器改变值触发
     selectedCatId(arr) {
 
       if (arr.length) {
-        // 发送请求动态参数
-        this.$http.get(`categories/${arr[arr.length - 1]}/attributes`, {
-          params: {
-            sel: 'many'
-          }
-        }).then(res => {
-          // console.log('动态参数返回的结果：', res)
-          let { data } = res.data
-          // console.log('添加之前inputVisible的值：', data)
-          // 赋值给manyAttrs之前给接口返回的动态参数每个对象中手动添加一个字段叫做inputVisible
-          data.map(item => {
-            // 手动给每个对象添加一个inputVisible的属性默认值为false
-            item.inputVisible = false
-          })
-          console.log('添加之后inputVisible的值：', data)
-          this.manyAttrs = data
-        })
-
+        this.getManyAttrs()
       }
+    },
+    // 请求动态参数列表
+    getManyAttrs() {
+      // 发送请求动态参数
+      this.$http.get(`categories/${this.catIdArr[this.catIdArr.length - 1]}/attributes`, {
+        params: {
+          sel: 'many'
+        }
+      }).then(res => {
+        // console.log('动态参数返回的结果：', res)
+        let { data } = res.data
+        // console.log('添加之前inputVisible的值：', data)
+        // 赋值给manyAttrs之前给接口返回的动态参数每个对象中手动添加一个字段叫做inputVisible
+        data.map(item => {
+          // 手动给每个对象添加一个inputVisible的属性默认值为false
+          item.inputVisible = false
+          item.inputValue = ''
+        })
+        console.log('添加之后inputVisible的值：', data)
+        this.manyAttrs = data
+      })
     },
     // 添加动态参数
     addMany() {
