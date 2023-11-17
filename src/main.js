@@ -3,6 +3,9 @@ import App from './App' // 导入App.vue组件
 import ElementUI from 'element-ui';
 import { Message } from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
+import TreeTable from 'vue-table-with-tree-grid'
+// 注册为全局组件
+Vue.component('tree-table', TreeTable)
 
 /** axios配置 - start  */
 // 导入axios
