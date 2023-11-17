@@ -24,16 +24,20 @@
           <el-table :data="manyAttrs" style="margin-top: 12px;width: 100%" border>
             <el-table-column type="expand">
               <template slot-scope="props">
+
                 <el-form label-position="left" inline class="demo-table-expand">
                   <el-form-item label="">
-                    <!-- tag -->
+
+                    <!-- 动态参数值 -->
                     <el-tag v-for="item in props.row.attr_vals.split(' ')" closable :disable-transitions="false" @close="handleClose(tag)">
                       {{ item }}
                     </el-tag>
-                    <el-input class="input-new-tag" v-if="inputVisible" v-model="inputValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm" @blur="handleInputConfirm">
+
+                    <el-input class="input-new-tag" v-if="props.row.inputVisible" v-model="inputValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm" @blur="handleInputConfirm">
                     </el-input>
-                    <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Tag</el-button>
-                    <!-- tag -->
+                    <el-button v-else class="button-new-tag" size="small" @click="showInput(props.row)">+ New Tag</el-button>
+                    <!-- 动态参数值 -->
+
                   </el-form-item>
                 </el-form>
               </template>
@@ -120,9 +124,10 @@ export default {
     handleClose(tag) {
       this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
     },
-
-    showInput() {
-      this.inputVisible = true;
+    // 点击new tag显示input框
+    showInput(obj) {
+      // 当前对象上面的inputVisible属性变为true
+      obj.inputVisible = true;
       this.$nextTick(_ => {
         this.$refs.saveTagInput.$refs.input.focus();
       });
@@ -146,8 +151,16 @@ export default {
             sel: 'many'
           }
         }).then(res => {
-          console.log('动态参数返回的结果：', res)
-          this.manyAttrs = res.data.data
+          // console.log('动态参数返回的结果：', res)
+          let { data } = res.data
+          // console.log('添加之前inputVisible的值：', data)
+          // 赋值给manyAttrs之前给接口返回的动态参数每个对象中手动添加一个字段叫做inputVisible
+          data.map(item => {
+            // 手动给每个对象添加一个inputVisible的属性默认值为false
+            item.inputVisible = false
+          })
+          console.log('添加之后inputVisible的值：', data)
+          this.manyAttrs = data
         })
 
       }
