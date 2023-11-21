@@ -69,11 +69,20 @@ AXIOS.interceptors.response.use(function(response) {
       Message.success(meta.msg)
 
   }
-
   // 对响应数据做点什么
   return response; // res.data.data
 }, function(error) {
 
+  console.log('请求报错啦：', error)
+  if (JSON.stringify(error).includes('timeout')) {
+    // 数据返回后关闭loading
+  loadingInstance.close()
+    Message.error('服务器响应超时，请检查网络')
+    // 数据返回后关闭loading
+    loadingInstance.close()
+
+    return
+  }
   return Promise.reject(error);
 
 });
