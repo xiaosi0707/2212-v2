@@ -2,7 +2,7 @@
 // 导入axios
 import Vue from 'vue'
 import Axios from 'axios'
-import { Loading } from 'element-ui';
+import { Loading, Message } from 'element-ui';
 let loadingInstance = null
 const AXIOS = Axios.create({
   // 配置前缀公共地址
@@ -31,9 +31,45 @@ AXIOS.interceptors.request.use(function(config) {
 // 添加响应拦截器
 AXIOS.interceptors.response.use(function(response) {
   console.log('响应拦截器的返回值：', response)
-  let { data } = response.data
+  let { data, meta } = response.data
   // 数据返回后关闭loading
   loadingInstance.close()
+  // 先关闭所有的提示
+  Message.closeAll()
+  // 针对不同的状态码返回不同的提示信息
+  switch (meta.status) {
+    case 200:
+      Message.success(meta.msg)
+      break;
+    case 201:
+      Message.success(meta.msg)
+      break;
+    case 204:
+      Message.success(meta.msg)
+      break;
+    case 400:
+      Message.error(meta.msg)
+      break;
+    case 401:
+      Message.error(meta.msg)
+      break;
+    case 403:
+      Message.error(meta.msg)
+      break;
+    case 404:
+      Message.error(meta.msg)
+      break;
+    case 422:
+      Message.error(meta.msg)
+      break;
+    case 500:
+      Message.error(meta.msg)
+      break;
+    default:
+      Message.success(meta.msg)
+
+  }
+
   // 对响应数据做点什么
   return response; // res.data.data
 }, function(error) {

@@ -302,12 +302,7 @@ export default {
                 this.addUserForm).then(res => {
                     console.log('添加用户返回的数据：', res)
                     // 成功的判断
-                    if (res.data.meta.status === 201) {
-                        this.$message.success(res.data.meta.msg)
-                        // 显示最新的添加的数据
-                        this.getUserData()
-                        return
-                    }
+                    if (res) this.getUserData()
 
                 })
         },
@@ -323,20 +318,7 @@ export default {
                  * */
                 this.$http.delete(`users/${userId}`).then(res => {
                     // 删除成功
-                    if (res.data.meta.status === 200) {
-                        this.$message({
-                            type: 'success',
-                            message: res.data.meta.msg
-                        });
-                        // 再次调用用户列表的接口（刷新数据）
-                        this.getUserData()
-                    } else {
-                        // 删除失败
-                        this.$message({
-                            type: 'error',
-                            message: res.data.meta.msg
-                        });
-                    }
+                    if (res) this.getUserData() 
                 })
 
             }).catch(() => {
