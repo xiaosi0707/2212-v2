@@ -9,6 +9,7 @@ import Goods from '../views/goods.vue'
 import GoodsAdd from '../views/goods-add.vue'
 import Params from '../views/params.vue'
 import Cate from '../views/cate.vue'
+import Reports from '../views/reports.vue'
 
 //3．创建路由的实例对象
 const router = new VueRouter({
@@ -42,6 +43,10 @@ const router = new VueRouter({
         {
           path: '/categories',
           component: Cate
+        },
+        {
+          path: '/reports',
+          component: Reports
         }
       ]
     }
