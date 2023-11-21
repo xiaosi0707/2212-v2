@@ -135,6 +135,7 @@
 export default {
     data() {
         return {
+            
             currentPage1: 5,
             currentPage2: 5,
             currentPage3: 5,
@@ -285,7 +286,8 @@ export default {
             this.$http.get('users', {
                 params: this.usersParams
             },).then(res => {
-                console.log(res)
+                console.log(res) // -> 数据
+               
                 let { users,total } = res.data.data
                 this.usersListTotal = total
                 this.usersData = users
