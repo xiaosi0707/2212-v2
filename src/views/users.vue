@@ -49,15 +49,10 @@
                 @size-change -> 每页条数发生了变化我就执行handleSizeChange方法
                 @current-change -> 当前页码发生变化就会执行handleCurrentChange方法
                 :page-sizes -> 配置每页多少条数据下拉菜单的数组
-                :current-page -> 
+                :current-page ->  当前是第几页
                 :total => 总条数
             -->
-            <el-pagination 
-                @size-change="handleSizeChange" 
-                @current-change="handleCurrentChange"
-                :current-page="usersParams.pagenum" :page-sizes="[2, 4, 6, 8]"
-                layout="total, sizes, prev, pager, next, jumper" :total="usersListTotal">
-            </el-pagination>
+           <Page :num="usersParams.pagenum" :size="[2, 4, 6, 8]" :total="usersListTotal" @sendSizeChange="handleSizeChange" @sendCurrentChange="handleCurrentChange"/>
         </el-card>
         <!-- 表格 -->
         <!-- 添加用户的模态框 -->
@@ -129,9 +124,11 @@
 <script>
 // 导入search组件
 import Search from '../components/search.vue'
+import Page from '../components/page.vue'
 export default {
     components: {
-        Search
+        Search,
+        Page
     },
     data() {
         return {
