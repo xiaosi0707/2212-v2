@@ -11,11 +11,7 @@
         <el-card class="box-card">
             <div slot="header" class="clearfix">
                 <span>
-                    <el-input placeholder="请输入内容"  style="width: 32%; margin-right: 10px;">
-                        <template slot="append">
-                            <i class="el-icon-search" ></i>
-                        </template>
-                    </el-input>
+                    <Search @sendSearch="search" />
                     <el-button type="primary" @click="goGoodsAdd">添加商品</el-button>
                 </span>
             </div>
@@ -25,12 +21,36 @@
     </div>
 </template>
 <script>
+import Search from '../components/search.vue'
 export default {
+    components: {
+        Search
+    },
+    data() {
+        return {
+             // 请求用户列表的参数
+            goodsParams: {
+                query: '',
+                pagenum: 1,
+                pagesize: 2
+            },
+        }
+    },
     methods: {
         // 去添加商品的组件
         goGoodsAdd() {
             this.$router.push('/add')
-        }
+        },
+        // 搜索用户
+        search(searchKey) {
+            this.goodsParams.query = searchKey
+            this.$http.get('goods', {
+                params: this.goodsParams,
+
+            }).then(res => {
+                console.log('搜索结果：', res)
+            })
+        },
     }
 }
 </script>

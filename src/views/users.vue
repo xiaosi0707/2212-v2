@@ -11,11 +11,7 @@
         <el-card class="box-card">
             <div slot="header" class="clearfix">
                 <span>
-                    <el-input placeholder="请输入内容" v-model="usersParams.query" style="width: 32%; margin-right: 10px;">
-                        <template slot="append">
-                            <i class="el-icon-search" @click="search"></i>
-                        </template>
-                    </el-input>
+                    <Search @sendSearch="search" />
                     <el-button type="primary" @click="dialogFormVisible = true">添加用户</el-button>
                 </span>
             </div>
@@ -131,8 +127,12 @@
     </div>
 </template>
 <script>
-
+// 导入search组件
+import Search from '../components/search.vue'
 export default {
+    components: {
+        Search
+    },
     data() {
         return {
             
@@ -270,7 +270,8 @@ export default {
                 })
         },
         // 搜索用户
-        search() {
+        search(searchKey) {
+            this.usersParams.query = searchKey
             this.$http.get('users', {
                 params: this.usersParams,
 
