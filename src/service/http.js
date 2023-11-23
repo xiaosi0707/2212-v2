@@ -16,10 +16,10 @@ Vue.prototype.$http = AXIOS
 // 添加请求拦截器
 AXIOS.interceptors.request.use(function(config) {
   // 打开loading
-  loadingInstance = Loading.service({
-    text: '拼了老命加载中...',
-    spinner: 'el-icon-video-camera'
-  })
+  // loadingInstance = Loading.service({
+  //   text: '拼了老命加载中...',
+  //   spinner: 'el-icon-video-camera'
+  // })
   config.headers.Authorization = localStorage.getItem('token')
   // 在发送请求之前做些什么
   return config;
@@ -33,7 +33,7 @@ AXIOS.interceptors.response.use(function(response) {
   console.log('响应拦截器的返回值：', response)
   let { data, meta } = response.data
   // 数据返回后关闭loading
-  loadingInstance.close()
+  // loadingInstance.close()
   // 先关闭所有的提示
   Message.closeAll()
   // 针对不同的状态码返回不同的提示信息
