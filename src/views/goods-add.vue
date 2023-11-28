@@ -70,7 +70,7 @@
             on-preview 点击文件列表中的文件触发的属性
             on-remove 点击文件列表中的文件删除按钮触发的属性
            -->
-          <el-upload class="upload-demo" action="http://43.138.15.137:7001/api/private/v1/upload" :on-preview="handlePreview" :headers="headersObj" :on-remove="handleRemove" :file-list="fileList" :on-success="successHandle" list-type="picture">
+          <el-upload class="upload-demo" :action="actionsUrl + 'upload'" :on-preview="handlePreview" :headers="headersObj" :on-remove="handleRemove" :file-list="fileList" :on-success="successHandle" list-type="picture">
             <el-button size="small" type="primary">点击上传</el-button>
             <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
           </el-upload>
@@ -95,6 +95,7 @@ export default {
   components: { quillEditor },
   data() {
     return {
+      actionsUrl: process.env.VUE_APP_SERVE,
       // 上传图片鉴权
       headersObj: {
         'Authorization': localStorage.getItem('token')

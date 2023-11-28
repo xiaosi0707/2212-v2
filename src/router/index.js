@@ -13,6 +13,7 @@ import Reports from '../views/reports.vue'
 
 //3．创建路由的实例对象
 const router = new VueRouter({
+  mode: "history", // 两个可选值（hash/history）
   routes: [{
       path: "/",
       component: Login,

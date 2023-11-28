@@ -27,3 +27,4 @@ new Vue({
   render: h => h(App), // 把App组件挂载到#app的html页面上
   router // 全局挂载Vue实例对象
 }).$mount('#app')
+console.log(`环境变量对象：${JSON.stringify(process.env)}`)

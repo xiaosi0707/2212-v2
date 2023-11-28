@@ -1,9 +1,9 @@
 <template>
   <div id="app">
     <!-- 一级路由 -->
-    <transition :appear="true">
+   
       <router-view />
-    </transition>
+   
   </div>
 </template>
 <style>

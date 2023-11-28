@@ -7,7 +7,7 @@ let loadingInstance = null
 const AXIOS = Axios.create({
   // 配置前缀公共地址
   // baseURL: 'http://shiyansong.cn:8888/api/private/v1/',
-  baseURL: 'http://43.138.15.137:7001/api/private/v1/',
+  baseURL: process.env.VUE_APP_SERVE,
   // 超时配置
   timeout: 1000 * 100
 })
