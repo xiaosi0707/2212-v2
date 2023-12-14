@@ -1,6 +1,8 @@
 import Vue from 'vue' // 导入vue.js相当于
 import App from './App' // 导入App.vue组件
 import ElementUI from 'element-ui';
+// 导入Vuex store对象
+import store from './store'
 import { Message } from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import TreeTable from 'vue-table-with-tree-grid'
@@ -25,5 +27,7 @@ Vue.config.productionTip = false
 // Vue实例
 new Vue({
   render: h => h(App), // 把App组件挂载到#app的html页面上
-  router // 全局挂载Vue实例对象
+  router, // 全局挂载Vue实例对象
+  store
 }).$mount('#app')
+console.log(`环境变量对象：${JSON.stringify(process.env)}`)
