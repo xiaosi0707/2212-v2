@@ -1,22 +1,12 @@
 <template>
-    <div id="app">
-        <div class="todoForm">
-            <p>
-                <input type="text" placeholder="请输入任务" class="addInput" @keyup="getVal" :value="inputValue">
-                <button class="addBtn" @click="add">添加事项</button>
-            </p>
-            <ul class="dataList">
-                <li v-for="item in list">
-                    <input type="checkbox" :checked="item.done" @change="changeStatus(item.id)">
-                    <span>{{ item.info }}</span>
-                    <a href="javascript:;" @click="del(item.id)">删除</a>
-                </li>
-            </ul>
-            <div class="txt">已完成（{{ doneLength }}）未完成（{{ unDoneLength }}）</div>
-        </div>
-<hr>
-<el-button type="primary" @click="increment">计数器加加:{{ $store.state.Count.count }}</el-button>
-    </div>
+
+  <div id="app">
+    <!-- 一级路由 -->
+   
+      <router-view />
+   
+  </div>
+
 </template>
 
 <script>
