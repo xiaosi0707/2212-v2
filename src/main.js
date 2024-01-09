@@ -1,5 +1,7 @@
 import Vue from 'vue' // 导入vue.js相当于
 import App from './App' // 导入App.vue组件
+// 导入打印的包
+import Print from 'vue-print-nb'
 import ElementUI from 'element-ui';
 // 导入Vuex store对象
 import store from './store'
@@ -21,7 +23,7 @@ Vue.component('tree-table', TreeTable)
 
 // 导入路由对象
 import router from './router'
-Vue.use(ElementUI)
+Vue.use(ElementUI).use(Print)
 // 关闭开发环境的提示
 Vue.config.productionTip = false
 // Vue实例
