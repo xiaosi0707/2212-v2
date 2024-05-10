@@ -7,7 +7,7 @@
       <el-input v-model="form.password"></el-input>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" class="wyf-btn-login" @click="login">登15陆</el-button>
+      <el-button type="primary" class="wyf-btn-login" @click="login">登16陆</el-button>
     </el-form-item>
   </el-form>
 </template>
